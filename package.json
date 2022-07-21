@@ -10,7 +10,12 @@
     "type": "git",
     "url": "git+https://github.com/ferrodri/quadratic-voting-dao.git"
   },
-  "keywords": ["quadratic voting", "dao", "QV", "solidity"],
+  "keywords": [
+    "quadratic voting",
+    "dao",
+    "QV",
+    "solidity"
+  ],
   "author": "Fernando Rodriguez Hervias",
   "license": "MIT",
   "bugs": {
@@ -20,5 +25,8 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
     "hardhat": "^2.10.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.1"
   }
 }
