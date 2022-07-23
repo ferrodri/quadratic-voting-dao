@@ -5,7 +5,14 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 contract GovernanceToken is ERC20Votes {
     uint256 public maxSupply = 10;
 
-    // TODO: frh -> explain this on the email and test you can sign with no gas and look at overrides again, https://docs.openzeppelin.com/contracts/4.x/api/token/erc20#ERC20Permit
+    /**
+     * Implementation of the ERC20 Permit extension allowing approvals to be 
+     * made via signatures, as defined in EIP-2612. Adds the permit method, 
+     * which can be used to change an account’s ERC20 allowance 
+     * (see IERC20.allowance) by presenting a message signed by the account. 
+     * By not relying on IERC20.approve, the token holder account doesn’t need 
+     * to send a transaction, and thus is not required to hold Ether at all.
+     */
     constructor()
         ERC20("GovernanceToken", "GT")
         ERC20Permit("GovernanceToken")
