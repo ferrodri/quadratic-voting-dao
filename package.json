@@ -1,33 +1,33 @@
 {
-  "name": "quadratic-voting-dao",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ferrodri/quadratic-voting-dao.git"
-  },
-  "keywords": [
-    "quadratic voting",
-    "dao",
-    "QV",
-    "solidity"
-  ],
-  "author": "Fernando Rodriguez Hervias",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ferrodri/quadratic-voting-dao/issues"
-  },
-  "homepage": "https://github.com/ferrodri/quadratic-voting-dao#readme",
-  "devDependencies": {
-    "@nomicfoundation/hardhat-network-helpers": "1.0.3",
-    "@nomicfoundation/hardhat-toolbox": "1.0.2",
-    "hardhat": "2.10.1"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "4.7.1"
-  }
+    "name": "quadratic-voting-dao",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ferrodri/quadratic-voting-dao.git"
+    },
+    "keywords": [
+        "quadratic voting",
+        "dao",
+        "QV",
+        "solidity"
+    ],
+    "author": "Fernando Rodriguez Hervias",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ferrodri/quadratic-voting-dao/issues"
+    },
+    "homepage": "https://github.com/ferrodri/quadratic-voting-dao#readme",
+    "devDependencies": {
+        "@nomicfoundation/hardhat-network-helpers": "1.0.3",
+        "@nomicfoundation/hardhat-toolbox": "1.0.2",
+        "hardhat": "2.10.1"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "4.7.1"
+    }
 }

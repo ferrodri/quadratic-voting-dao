@@ -1,7 +1,17 @@
 {
-  "extends": "solhint:recommended",
-  "rules": {
-    "compiler-version": ["error", "^0.8.9"],
-    "func-visibility": ["warn", { "ignoreConstructors": true }]
-  }
+    "extends": "solhint:recommended",
+    "rules": {
+        "compiler-version": [
+            "error",
+            "0.8.9"
+        ],
+        "func-visibility": [
+            "warn",
+            {
+                "ignoreConstructors": true
+            }
+        ],
+        "private-vars-leading-underscore": ["warn",{"strict":false}],
+        "quotes": ["error","single"]
+    }
 }
