@@ -45,7 +45,7 @@ describe('DAOModerators', async () => {
             expect(moderators).to.have.lengthOf(0);
         });
     });
-    
+
     describe('Events', function () {
         it('Should emit an event on the appointment of a new moderator', async () => {
             const DAOModerators = await loadFixture(deployContractFixture);
