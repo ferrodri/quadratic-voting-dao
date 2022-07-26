@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 // Import this file to use console.log
-import "hardhat/console.sol";
+import 'hardhat/console.sol';
 
 contract Lock {
     uint public unlockTime;
@@ -13,7 +13,7 @@ contract Lock {
     constructor(uint _unlockTime) payable {
         require(
             block.timestamp < _unlockTime,
-            "Unlock time should be in the future"
+            'Unlock time should be in the future'
         );
 
         unlockTime = _unlockTime;
@@ -22,10 +22,10 @@ contract Lock {
 
     function withdraw() public {
         // Uncomment this line to print a log in your terminal
-        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
+        // console.log('Unlock time is %o and block timestamp is %o', unlockTime, block.timestamp);
 
-        require(block.timestamp >= unlockTime, "You can't withdraw yet");
-        require(msg.sender == owner, "You aren't the owner");
+        require(block.timestamp >= unlockTime, 'You cannot withdraw yet');
+        require(msg.sender == owner, 'You are not the owner');
 
         emit Withdrawal(address(this).balance, block.timestamp);
 

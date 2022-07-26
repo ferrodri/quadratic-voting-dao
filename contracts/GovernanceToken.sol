@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+pragma solidity =0.8.9;
+import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol';
 
 contract GovernanceToken is ERC20Votes {
-    uint256 public maxSupply = 10;
+    uint256 public maxSupply = 3000000000000000000;
 
     /**
      * Implementation of the ERC20 Permit extension allowing approvals to be 
@@ -14,8 +14,8 @@ contract GovernanceToken is ERC20Votes {
      * to send a transaction, and thus is not required to hold Ether at all.
      */
     constructor()
-        ERC20("GovernanceToken", "GT")
-        ERC20Permit("GovernanceToken")
+        ERC20('GovernanceToken', 'GT')
+        ERC20Permit('GovernanceToken')
     {
         _mint(msg.sender, maxSupply);
     }
