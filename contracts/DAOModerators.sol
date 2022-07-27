@@ -3,9 +3,7 @@ pragma solidity =0.8.9;
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 /**
- * Example contract. Moderators of our DAO would be changed through quadratic
- * voting. Nonetheless, you can propose and vote to change whatever you want
- * through quadratic voting, this is just an example.
+ * @title Template for appointing the moderators of a DAO
  */
 contract DAOModerators is Ownable {
     struct Moderator {
