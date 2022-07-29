@@ -59,6 +59,17 @@ describe('GovernanceToken', function () {
                 expect(await GovernanceToken.balanceOf(to)).to.equal(amount);
             }
         );
+
+        it('Transfer should fail if transfer amount is more than ERC20Votes balance',
+            async function () {
+                const GovernanceToken = await loadFixture(deployContractFixture);
+                const [, { address: to }] = await ethers.getSigners();
+                const amount = totalSupply + 50;
+                await expect(
+                    GovernanceToken.transfer(to, BigNumber.from((amount).toString()))
+                ).to.be.reverted;
+            }
+        );
     });
 
 });
