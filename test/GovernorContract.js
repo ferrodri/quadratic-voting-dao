@@ -11,8 +11,11 @@ const {
 
 // Example proposal description
 const proposalDescription = 'Example proposal description';
+// Voting params
+const sufficientVotingWeightTwoProposals = 10;
+const sufficientVotingWeight = 15;
+const exceededVotingWeight = 20;
 // Vote with 'For' support, enum is Against (0), For(1), Abstain(2)
-// TODO: frh -> check to see if test this types and leave this in constans
 const supportFor = 1;
 // enum ProposalState {
 //     Pending,
@@ -26,10 +29,10 @@ const supportFor = 1;
 // }
 
 const createProposal = async (
-    GovernorContract, GovernanceToken, DAOModerators
+    GovernorContract, GovernanceToken, DAOModerators, moderatorIndex
 ) => {
 
-    const calldata = getCalldata(DAOModerators);
+    const calldata = getCalldata(DAOModerators, moderatorIndex);
 
     const [{ address: owner }] = await ethers.getSigners();
     await GovernanceToken.delegate(owner);
@@ -46,12 +49,13 @@ const createProposal = async (
 
     return {
         status: receipt.status,
+        owner,
         proposalId: createProposalEvent[0].args.proposalId
     };
 }
 
-const getCalldata = (DAOModerators) => {
-    const { NAME, EMAIL, MODERATOR_ADDRESS } = NEW_MODERATORS[0];
+const getCalldata = (DAOModerators, moderatorIndex) => {
+    const { NAME, EMAIL, MODERATOR_ADDRESS } = NEW_MODERATORS[moderatorIndex];
     return DAOModerators.interface.encodeFunctionData(
         SET_NEW_MODERATOR_FN, [NAME, EMAIL, MODERATOR_ADDRESS]
     );
@@ -68,7 +72,7 @@ describe('GovernorContract', function () {
                 GovernorContract, GovernanceToken, DAOModerators
             } = await loadFixture(deployGovernorContractFixture);
             const { status } = await createProposal(
-                GovernorContract, GovernanceToken, DAOModerators
+                GovernorContract, GovernanceToken, DAOModerators, 0
             );
             expect(status).to.equal(1);
         });
@@ -77,7 +81,7 @@ describe('GovernorContract', function () {
             const { GovernorContract, DAOModerators } =
                 await loadFixture(deployGovernorContractFixture);
 
-            const calldata = getCalldata(DAOModerators);
+            const calldata = getCalldata(DAOModerators, 0);
 
             await expect(
                 GovernorContract.propose(
@@ -99,7 +103,7 @@ describe('GovernorContract', function () {
                 await GovernanceToken
                     .transfer(to, BigNumber.from(TOTAL_SUPPLY - 1));
 
-                const calldata = getCalldata(DAOModerators);
+                const calldata = getCalldata(DAOModerators, 0);
 
                 await expect(
                     GovernorContract.propose(
@@ -109,6 +113,35 @@ describe('GovernorContract', function () {
                 ).to.be.reverted;
             }
         );
+
+        it('Should create two proposals', async function () {
+            const {
+                GovernorContract, GovernanceToken, DAOModerators
+            } = await loadFixture(deployGovernorContractFixture);
+            const { status } = await createProposal(
+                GovernorContract, GovernanceToken, DAOModerators, 0
+            );
+            expect(status).to.equal(1);
+            const proposal = await createProposal(
+                GovernorContract, GovernanceToken, DAOModerators, 1
+            );
+            expect(proposal.status).to.equal(1);
+        });
+
+        it('Should fail when creating two equal proposals', async function () {
+            const {
+                GovernorContract, GovernanceToken, DAOModerators
+            } = await loadFixture(deployGovernorContractFixture);
+            const { status } = await createProposal(
+                GovernorContract, GovernanceToken, DAOModerators, 0
+            );
+            expect(status).to.equal(1);
+            await expect(
+                createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 0
+                )
+            ).to.be.reverted;
+        });
     });
 
     describe('Voting', function () {
@@ -117,39 +150,110 @@ describe('GovernorContract', function () {
                 GovernorContract, GovernanceToken, DAOModerators
             } = await loadFixture(deployGovernorContractFixture);
             const { owner, proposalId } = await createProposal(
-                GovernorContract, GovernanceToken, DAOModerators
+                GovernorContract, GovernanceToken, DAOModerators, 0
             );
-
-            console.log('proposalId: ', proposalId);
 
             await moveBlocks(INITIAL_VOTING_DELAY + 1);
 
-            // TODO: frh -> weight
-            const tx = await GovernorContract.vote(proposalId, 300, supportFor);
-
-            const receipt = await tx.wait();
-            console.log('receipt: ', receipt.events);
-
-            const hola = await GovernorContract.state(proposalId);
-            console.log('hola: ', hola);
-
-
-
+            await GovernorContract.vote(
+                proposalId, sufficientVotingWeight, supportFor
+            );
+            expect(
+                await GovernorContract.hasVoted(proposalId, owner)
+            ).to.be.true;
         });
 
         it('Should fail if voter casts more votes that he has to one proposal',
             async function () {
+                const {
+                    GovernorContract, GovernanceToken, DAOModerators
+                } = await loadFixture(deployGovernorContractFixture);
+                const { proposalId } = await createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 0
+                );
+
+                await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+                await expect(
+                    GovernorContract
+                        .vote(proposalId, exceededVotingWeight, supportFor)
+                ).to.be.reverted;
             }
         );
 
-        it('Should fail if voter casts more votes that he has to two proposals',
+        it('Should vote for two proposals', async function () {
+            const {
+                GovernorContract, GovernanceToken, DAOModerators
+            } = await loadFixture(deployGovernorContractFixture);
+            const { owner, proposalId: firstProposalId } = await createProposal(
+                GovernorContract, GovernanceToken, DAOModerators, 0
+            );
+            const { proposalId: secondProposalId } = await createProposal(
+                GovernorContract, GovernanceToken, DAOModerators, 1
+            );
+
+            await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+            await GovernorContract.vote(
+                firstProposalId, sufficientVotingWeightTwoProposals, supportFor
+            );
+            expect(
+                await GovernorContract.hasVoted(firstProposalId, owner)
+            ).to.be.true;
+
+            await GovernorContract.vote(
+                secondProposalId, sufficientVotingWeightTwoProposals, supportFor
+            );
+            expect(
+                await GovernorContract.hasVoted(secondProposalId, owner)
+            ).to.be.true;
+        });
+
+        it('Should fail if voter casts more votes that he has for two proposals',
             async function () {
+                const {
+                    GovernorContract, GovernanceToken, DAOModerators
+                } = await loadFixture(deployGovernorContractFixture);
+                const { proposalId: firstProposalId } = await createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 0
+                );
+                const { proposalId: secondProposalId } = await createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 1
+                );
+
+                await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+                await GovernorContract.vote(
+                    firstProposalId, sufficientVotingWeight, supportFor
+                );
+
+                await expect(
+                    GovernorContract.vote(
+                        secondProposalId, sufficientVotingWeight, supportFor
+                    )
+                ).to.be.reverted;
             }
         );
     });
 
     describe('Events', function () {
         it('Should emit an event when a vote is casted', async () => {
+            const {
+                GovernorContract, GovernanceToken, DAOModerators
+            } = await loadFixture(deployGovernorContractFixture);
+            const { owner, proposalId } = await createProposal(
+                GovernorContract, GovernanceToken, DAOModerators, 0
+            );
+
+            await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+            await expect(
+                GovernorContract.vote(
+                    proposalId, sufficientVotingWeight, supportFor
+                )
+            )
+                .to.emit(GovernorContract, 'LogVoteCasted')
+                .withArgs(owner, proposalId, supportFor, sufficientVotingWeight);
         });
     });
 
@@ -202,5 +306,5 @@ describe('GovernorContract', function () {
             ).to.be.reverted;
         });
     });
-    
+
 });

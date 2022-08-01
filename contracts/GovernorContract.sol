@@ -14,7 +14,7 @@ import '@openzeppelin/contracts/governance/extensions/GovernorVotes.sol';
  */
 import '@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol';
 // Simple voting mechanism with 3 voting options: Against, For and Abstain
-import '@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol';
+import './GovernorCountingSimple.sol';
 // Connects with an instance of TimelockController
 import '@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol';
 /**
@@ -39,9 +39,18 @@ contract GovernorContract is
     using SafeCast for uint256;
     using Timers for Timers.BlockNumber;
 
+    /**
+     * @dev Emitted when a vote is casted
+     */
+    event LogVoteCasted(
+        address voter,
+        uint256 proposalId,
+        uint8 support,
+        uint256 weight
+    );
+
     mapping(uint256 => ProposalCore) private _proposals;
 
-    /* solhint-disable no-empty-blocks */
     constructor(
         IVotes tokenAddress,
         TimelockController timelockAddress,
@@ -60,7 +69,10 @@ contract GovernorContract is
         GovernorVotes(tokenAddress)
         GovernorVotesQuorumFraction(quorumNumeratorValue)
         GovernorTimelockControl(timelockAddress)
-    {}
+    // solhint-disable-next-line no-empty-blocks
+    {
+
+    }
 
     function vote(
         uint256 proposalId,
@@ -69,22 +81,39 @@ contract GovernorContract is
     ) public {
         address account = _msgSender();
         ProposalCore storage proposal = _proposals[proposalId];
-        require(
-            state(proposalId) == ProposalState.Active,
-            'Proposal not active'
-        );
-
-        uint256 totalWeight = _getVotes(
+        uint256 _totalWeight = _getVotes(
             account,
             proposal.voteStart.getDeadline(),
             _defaultParams()
         );
-        // console.log(availableWeight);
-        // emit VoteCast(account, proposalId, support, weight, reason);
-        _countVote(proposalId, account, support, weight, _defaultParams());
+        uint256 _quadraticWeight = weight**2;
+
+        require(
+            state(proposalId) == ProposalState.Active,
+            'Proposal not active'
+        );
+        require(
+            _castedVotes[account] + _quadraticWeight < _totalWeight,
+            'Exceeded voting power'
+        );
+
+        emit LogVoteCasted(msg.sender, proposalId, support, weight);
+        _countVote(
+            proposalId,
+            account,
+            support,
+            _quadraticWeight,
+            _defaultParams()
+        );
     }
 
-    // TODO: frh -> comment
+    /**
+     * @dev Create a new proposal. Vote start {IGovernor-votingDelay} blocks 
+     * after the proposal is created and ends {IGovernor-votingPeriod} blocks 
+     * after the voting starts.
+     *
+     * Emits a {ProposalCreated} event.
+     */
     function propose(
         address[] memory targets,
         uint256[] memory values,
@@ -179,7 +208,7 @@ contract GovernorContract is
         override(Governor, IGovernor)
         returns (uint256)
     {
-        /* solhint-disable reason-string */
+        // solhint-disable-next-line reason-string
         revert();
     }
 
@@ -189,7 +218,7 @@ contract GovernorContract is
         uint8,
         string memory
     ) public pure override(Governor, IGovernor) returns (uint256) {
-        /* solhint-disable reason-string */
+        // solhint-disable-next-line reason-string
         revert();
     }
 
@@ -200,7 +229,7 @@ contract GovernorContract is
         string calldata,
         bytes memory
     ) public pure override(Governor, IGovernor) returns (uint256) {
-        /* solhint-disable reason-string */
+        // solhint-disable-next-line reason-string
         revert();
     }
 
@@ -212,7 +241,7 @@ contract GovernorContract is
         bytes32,
         bytes32
     ) public pure override(Governor, IGovernor) returns (uint256) {
-        /* solhint-disable reason-string */
+        // solhint-disable-next-line reason-string
         revert();
     }
 
@@ -226,7 +255,7 @@ contract GovernorContract is
         bytes32,
         bytes32
     ) public pure override(Governor, IGovernor) returns (uint256) {
-        /* solhint-disable reason-string */
+        // solhint-disable-next-line reason-string
         revert();
     }
 
