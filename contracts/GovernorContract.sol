@@ -80,10 +80,9 @@ contract GovernorContract is
         uint8 support
     ) public {
         address account = _msgSender();
-        ProposalCore storage proposal = _proposals[proposalId];
         uint256 _totalWeight = _getVotes(
             account,
-            proposal.voteStart.getDeadline(),
+            _currentPeriodVoteStart.getDeadline(),
             _defaultParams()
         );
         uint256 _quadraticWeight = weight**2;
@@ -93,7 +92,9 @@ contract GovernorContract is
             'Proposal not active'
         );
         require(
-            _castedVotes[account] + _quadraticWeight < _totalWeight,
+            _castedVotes[_currentPeriodVoteStart.getDeadline()][account] +
+                _quadraticWeight <
+                _totalWeight,
             'Exceeded voting power'
         );
 
@@ -108,8 +109,8 @@ contract GovernorContract is
     }
 
     /**
-     * @dev Create a new proposal. Vote start {IGovernor-votingDelay} blocks 
-     * after the proposal is created and ends {IGovernor-votingPeriod} blocks 
+     * @dev Create a new proposal. Vote start {IGovernor-votingDelay} blocks
+     * after the proposal is created and ends {IGovernor-votingPeriod} blocks
      * after the voting starts.
      *
      * Emits a {ProposalCreated} event.
@@ -120,32 +121,123 @@ contract GovernorContract is
         bytes[] memory calldatas,
         string memory description
     ) public override(Governor, IGovernor) returns (uint256) {
-        uint256 proposalId = super.propose(
+        require(
+            getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
+            'Votes below proposal threshold'
+        );
+
+        uint256 proposalId = hashProposal(
             targets,
             values,
             calldatas,
-            description
+            keccak256(bytes(description))
         );
+
+        require(targets.length == values.length, 'Invalid proposal length');
+        require(targets.length == calldatas.length, 'Invalid proposal length');
+        require(targets.length > 0, 'Empty proposal');
+
         ProposalCore storage proposal = _proposals[proposalId];
+
         require(proposal.voteStart.isUnset(), 'Proposal already exists');
 
         uint64 snapshot = block.number.toUint64() + votingDelay().toUint64();
-        uint64 deadline = snapshot + votingPeriod().toUint64();
-
         proposal.voteStart.setDeadline(snapshot);
-        proposal.voteEnd.setDeadline(deadline);
+
+        /**
+         * @dev Proposals voting period should end at {_currentPeriodVoteEnd}.
+         * If {_currentPeriodVoteEnd} already expired, first proposal of a new
+         * voting period should establish a new {_currentPeriodVoteEnd}.
+         */
+        uint64 deadline;
+        if (
+            _currentPeriodVoteEnd.isStarted() &&
+            !_currentPeriodVoteEnd.isExpired()
+        ) {
+            deadline = _currentPeriodVoteEnd.getDeadline();
+            proposal.voteEnd.setDeadline(deadline);
+        } else {
+            deadline = snapshot + votingPeriod().toUint64();
+            proposal.voteEnd.setDeadline(deadline);
+            _currentPeriodVoteEnd.setDeadline(deadline);
+            /// @dev {_currentPeriodVoteStart} would be taken into account as
+            /// so to extract voting weight from token
+            _currentPeriodVoteStart.setDeadline(snapshot);
+        }
+
+        emit ProposalCreated(
+            proposalId,
+            _msgSender(),
+            targets,
+            values,
+            new string[](targets.length),
+            calldatas,
+            snapshot,
+            deadline,
+            description
+        );
 
         return proposalId;
     }
 
-    /// @dev See {GovernorTimelockControl-state}.
+    /// @dev See {IGovernor-state}.
     function state(uint256 proposalId)
         public
         view
         override(Governor, GovernorTimelockControl)
         returns (ProposalState)
     {
-        return GovernorTimelockControl.state(proposalId);
+        ProposalCore storage proposal = _proposals[proposalId];
+
+        if (proposal.executed) {
+            return ProposalState.Executed;
+        }
+
+        if (proposal.canceled) {
+            return ProposalState.Canceled;
+        }
+
+        uint256 snapshot = proposalSnapshot(proposalId);
+
+        if (snapshot == 0) {
+            revert('Governor: unknown proposal id');
+        }
+
+        if (snapshot >= block.number) {
+            return ProposalState.Pending;
+        }
+
+        uint256 deadline = proposalDeadline(proposalId);
+
+        if (deadline >= block.number) {
+            return ProposalState.Active;
+        }
+
+        if (_quorumReached(proposalId) && _voteSucceeded(proposalId)) {
+            return ProposalState.Succeeded;
+        } else {
+            return ProposalState.Defeated;
+        }
+    }
+
+    /// @dev See {IGovernor-proposalSnapshot}.
+    function proposalSnapshot(uint256 proposalId)
+        public
+        view
+        override(Governor, IGovernor)
+        returns (uint256)
+    {
+        return _proposals[proposalId].voteStart.getDeadline();
+    }
+
+    /// @dev See {IGovernor-proposalDeadline}.
+    function proposalDeadline(uint256 proposalId)
+        public
+        view
+        override(Governor, IGovernor)
+        returns (uint256)
+    {
+        return _proposals[proposalId].voteEnd.getDeadline();
     }
 
     /// @dev See {GovernorSettings-proposalThreshold}.

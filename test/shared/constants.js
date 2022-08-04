@@ -48,13 +48,25 @@ module.exports = {
          * or delegate it, before the voting of a proposal starts.
          */
         INITIAL_VOTING_DELAY: 1,
-        // Delay, in number of blocks, between the vote start and vote ends.
-        INITIAL_VOTING_PERIOD: 5,
+        /**
+         * Delay, in number of blocks, between the vote start and vote ends. 
+         * 45115 blocks is approximately one week.
+         * 
+         * For testing purposes, we are using lower values.
+         */
+        INITIAL_VOTING_PERIOD: 100,
+        /**
+         * Minimum delay, in number of blocks, between the vote start and vote 
+         * ends. 25780 blocks is approximately 4 days.
+         * 
+         * For testing purposes, we are using lower values.
+         */
+        MINIMUM_VOTING_PERIOD: 60,
         // The number of votes required in order for a voter to become a proposer
         INITIAL_PROPOSAL_THRESHOLD: 10,
         // Quorum is specified as `numerator / denominator`. By default the denominator 
         // is 100.
-        QUORUM_NUMERATOR_VALUE: 4,
+        QUORUM_NUMERATOR_VALUE: 4
     },
     TIMELOCK: {
         //Minimum delay in seconds for a timelock operation to become valid

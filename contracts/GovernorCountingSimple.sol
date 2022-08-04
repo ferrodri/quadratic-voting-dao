@@ -1,10 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.9;
 
+/**
+ * The core contract that contains all the logic and primitives. It is abstract
+ * and requires choosing some of the modules below, or custom ones
+ */
 import '@openzeppelin/contracts/governance/Governor.sol';
+
+/// Utils
+import '@openzeppelin/contracts/utils/Timers.sol';
 
 /// @dev Extension of {Governor} for simple, 3 options, vote counting.
 abstract contract GovernorCountingSimple is Governor {
+    using Timers for Timers.BlockNumber;
+
     /// @dev Supported vote types. Matches Governor Bravo ordering.
     enum VoteType {
         Against,
@@ -19,8 +28,21 @@ abstract contract GovernorCountingSimple is Governor {
         mapping(address => bool) hasVoted;
     }
 
+    /**
+     * @dev Proposals voting period should end at {_currentPeriodVoteEnd}.
+     * If {_currentPeriodVoteEnd} already expired, first proposal of a new voting
+     * period should establish a new {_currentPeriodVoteEnd}.
+     */
+    Timers.BlockNumber internal _currentPeriodVoteEnd;
+    /**
+     * @dev Block that accounts for started voting period of first proposal in
+     * a voting period. {_currentPeriodVoteStart} would be taken into account as
+     * so to extract voting weight from token.
+     */
+    Timers.BlockNumber internal _currentPeriodVoteStart;
+
     mapping(uint256 => ProposalVote) private _proposalVotes;
-    mapping(address => uint256) internal _castedVotes;
+    mapping(uint256 => mapping(address => uint256)) internal _castedVotes;
 
     /// @dev See {IGovernor-hasVoted}.
     function hasVoted(uint256 proposalId, address account)
@@ -48,15 +70,21 @@ abstract contract GovernorCountingSimple is Governor {
         if (support == uint8(VoteType.Against)) {
             proposalvote.againstVotes += weight;
             proposalvote.hasVoted[account] = true;
-            _castedVotes[account] += weight;
+            _castedVotes[_currentPeriodVoteStart.getDeadline()][
+                account
+            ] += weight;
         } else if (support == uint8(VoteType.For)) {
             proposalvote.forVotes += weight;
             proposalvote.hasVoted[account] = true;
-            _castedVotes[account] += weight;
+            _castedVotes[_currentPeriodVoteStart.getDeadline()][
+                account
+            ] += weight;
         } else if (support == uint8(VoteType.Abstain)) {
             proposalvote.abstainVotes += weight;
             proposalvote.hasVoted[account] = true;
-            _castedVotes[account] += weight;
+            _castedVotes[_currentPeriodVoteStart.getDeadline()][
+                account
+            ] += weight;
         } else {
             revert('Invalid value for enum VoteType');
         }
