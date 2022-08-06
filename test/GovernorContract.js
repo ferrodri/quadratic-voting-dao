@@ -7,12 +7,10 @@ const {
     DAO_MODERATORS: { NEW_MODERATORS, SET_NEW_MODERATOR_FN },
     GOVERNANCE_TOKEN: { TOTAL_SUPPLY },
     GOVERNOR_CONTRACT: {
-        INITIAL_VOTING_DELAY, INITIAL_VOTING_PERIOD
+        INITIAL_VOTING_DELAY, INITIAL_VOTING_PERIOD, INITIAL_MINIMUM_VOTING_PERIOD
     }
 } = require('./shared/constants');
-// TODO: frh -> Remove timelock and proposalstate variable, Set minimum for quadratic voting, test for  
-// moving tokens and weight, after commit minimum voting period with custom 
-// governor settings
+// TODO: frh -> Set minimum for quadratic voting, test for moving tokens and weight
 
 // Example proposal description
 const proposalDescription = 'Example proposal description';
@@ -131,11 +129,6 @@ describe('GovernorContract', function () {
             }
         );
 
-        // TODO: frh -> this
-        it('Second proposal should fail if minimum voting period cannot be reached',
-            async function () {}
-        );
-
         it('Should create two proposals', async function () {
             const {
                 GovernorContract, GovernanceToken, DAOModerators
@@ -152,6 +145,28 @@ describe('GovernorContract', function () {
             );
             expect(proposal.status).to.equal(1);
         });
+
+        it('Second proposal should fail if minimum voting period cannot be reached',
+            async function () {
+                const {
+                    GovernorContract, GovernanceToken, DAOModerators
+                } = await loadFixture(deployGovernorContractFixture);
+                const { status } = await createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 0
+                );
+                expect(status).to.equal(1);
+
+                await moveBlocks(
+                    INITIAL_VOTING_PERIOD - INITIAL_MINIMUM_VOTING_PERIOD + 1
+                );
+
+                await expect(
+                    createProposal(
+                        GovernorContract, GovernanceToken, DAOModerators, 1
+                    )
+                ).to.be.reverted;
+            }
+        );
 
         it('Should create two proposals in different voting periods',
             async function () {

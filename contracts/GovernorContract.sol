@@ -16,11 +16,11 @@ import '@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFractio
 // Simple voting mechanism with 3 voting options: Against, For and Abstain
 import './GovernorCountingSimple.sol';
 /**
- * Manages some of the settings (voting delay, voting period duration, and
- * proposal threshold) in a way that can be updated through a governance
- * proposal, without requiring an upgrade
+ * Manages some of the settings (voting delay, initial and minimum voting period
+ * duration, and proposal threshold) in a way that can be updated through a
+ * governance proposal, without requiring an upgrade
  */
-import '@openzeppelin/contracts/governance/extensions/GovernorSettings.sol';
+import './GovernorSettings.sol';
 
 /// Utils
 import '@openzeppelin/contracts/utils/Timers.sol';
@@ -53,6 +53,7 @@ contract GovernorContract is
         string memory name_,
         uint256 initialVotingDelay,
         uint256 initialVotingPeriod,
+        uint256 initialMinimumVotingPeriod,
         uint256 initialProposalThreshold,
         uint256 quorumNumeratorValue
     )
@@ -60,6 +61,7 @@ contract GovernorContract is
         GovernorSettings(
             initialVotingDelay,
             initialVotingPeriod,
+            initialMinimumVotingPeriod,
             initialProposalThreshold
         )
         GovernorVotes(tokenAddress)
@@ -104,9 +106,7 @@ contract GovernorContract is
     }
 
     /**
-     * @dev Create a new proposal. Vote start {IGovernor-votingDelay} blocks
-     * after the proposal is created and ends {IGovernor-votingPeriod} blocks
-     * after the voting starts.
+     * @dev Create a new proposal.
      *
      * Emits a {ProposalCreated} event.
      */
@@ -150,6 +150,12 @@ contract GovernorContract is
             !_currentPeriodVoteEnd.isExpired()
         ) {
             deadline = _currentPeriodVoteEnd.getDeadline();
+
+            require(
+                deadline - block.number > minimumVotingPeriod(),
+                'Voting period should be longer'
+            );
+
             proposal.voteEnd.setDeadline(deadline);
         } else {
             deadline = snapshot + votingPeriod().toUint64();

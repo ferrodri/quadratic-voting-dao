@@ -59,7 +59,7 @@ module.exports = {
          * 
          * For testing purposes, we are using lower values.
          */
-        MINIMUM_VOTING_PERIOD: 60,
+        INITIAL_MINIMUM_VOTING_PERIOD: 60,
         // The number of votes required in order for a voter to become a proposer
         INITIAL_PROPOSAL_THRESHOLD: 10,
         // Quorum is specified as `numerator / denominator`. By default the denominator 
