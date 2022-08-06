@@ -4,8 +4,7 @@ const {
     GOVERNOR_CONTRACT: { 
         NAME: GOVERNOR_CONTRACT_NAME,  INITIAL_VOTING_DELAY, 
         INITIAL_VOTING_PERIOD, INITIAL_PROPOSAL_THRESHOLD, QUORUM_NUMERATOR_VALUE
-    },
-    TIMELOCK: { MIN_DELAY }
+    }
 } = require('./constants');
 
 const deployDAOModeratorsFixture = async () => {
@@ -38,14 +37,12 @@ const deployGovernanceTokenFixture = async () => {
 const deployGovernorContractFixture = async () => {
     const DAOModerators = await deployDAOModeratorsFixture();
     const GovernanceToken = await deployGovernanceTokenFixture();
-    const Timelock = await deployTimelockFixture();
 
     const GovernorFactory = await ethers.getContractFactory('GovernorContract');
 
     const GovernorContract =
         await GovernorFactory.deploy(
             GovernanceToken.address,
-            Timelock.address,
             GOVERNOR_CONTRACT_NAME,
             INITIAL_VOTING_DELAY,
             INITIAL_VOTING_PERIOD,
@@ -58,18 +55,7 @@ const deployGovernorContractFixture = async () => {
     return { GovernorContract, GovernanceToken, DAOModerators };
 };
 
-const deployTimelockFixture = async () => {
-    const timelockFactory = await ethers.getContractFactory('Timelock');
-
-    const Timelock =
-        await timelockFactory.deploy(MIN_DELAY, [], []);
-
-    await Timelock.deployed();
-
-    return Timelock;
-};
-
 module.exports = {
     deployDAOModeratorsFixture, deployGovernanceTokenFixture,
-    deployGovernorContractFixture, deployTimelockFixture
+    deployGovernorContractFixture
 }

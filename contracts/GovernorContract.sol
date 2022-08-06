@@ -15,8 +15,6 @@ import '@openzeppelin/contracts/governance/extensions/GovernorVotes.sol';
 import '@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol';
 // Simple voting mechanism with 3 voting options: Against, For and Abstain
 import './GovernorCountingSimple.sol';
-// Connects with an instance of TimelockController
-import '@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol';
 /**
  * Manages some of the settings (voting delay, voting period duration, and
  * proposal threshold) in a way that can be updated through a governance
@@ -33,8 +31,7 @@ contract GovernorContract is
     GovernorSettings,
     GovernorCountingSimple,
     GovernorVotes,
-    GovernorVotesQuorumFraction,
-    GovernorTimelockControl
+    GovernorVotesQuorumFraction
 {
     using SafeCast for uint256;
     using Timers for Timers.BlockNumber;
@@ -53,7 +50,6 @@ contract GovernorContract is
 
     constructor(
         IVotes tokenAddress,
-        TimelockController timelockAddress,
         string memory name_,
         uint256 initialVotingDelay,
         uint256 initialVotingPeriod,
@@ -68,7 +64,6 @@ contract GovernorContract is
         )
         GovernorVotes(tokenAddress)
         GovernorVotesQuorumFraction(quorumNumeratorValue)
-        GovernorTimelockControl(timelockAddress)
     // solhint-disable-next-line no-empty-blocks
     {
 
@@ -120,7 +115,7 @@ contract GovernorContract is
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
-    ) public override(Governor, IGovernor) returns (uint256) {
+    ) public override(Governor) returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
             'Votes below proposal threshold'
@@ -184,7 +179,7 @@ contract GovernorContract is
     function state(uint256 proposalId)
         public
         view
-        override(Governor, GovernorTimelockControl)
+        override(Governor)
         returns (ProposalState)
     {
         ProposalCore storage proposal = _proposals[proposalId];
@@ -224,7 +219,7 @@ contract GovernorContract is
     function proposalSnapshot(uint256 proposalId)
         public
         view
-        override(Governor, IGovernor)
+        override(Governor)
         returns (uint256)
     {
         return _proposals[proposalId].voteStart.getDeadline();
@@ -234,7 +229,7 @@ contract GovernorContract is
     function proposalDeadline(uint256 proposalId)
         public
         view
-        override(Governor, IGovernor)
+        override(Governor)
         returns (uint256)
     {
         return _proposals[proposalId].voteEnd.getDeadline();
@@ -250,54 +245,11 @@ contract GovernorContract is
         return GovernorSettings.proposalThreshold();
     }
 
-    /// @dev See {GovernorTimelockControl-_execute}.
-    function _execute(
-        uint256 proposalId,
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
-        bytes32 descriptionHash
-    ) internal override(Governor, GovernorTimelockControl) {
-        GovernorTimelockControl._execute(
-            proposalId,
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
-    }
-
-    /// @dev See {GovernorTimelockControl-_cancel}.
-    function _cancel(
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
-        bytes32 descriptionHash
-    ) internal override(Governor, GovernorTimelockControl) returns (uint256) {
-        return
-            GovernorTimelockControl._cancel(
-                targets,
-                values,
-                calldatas,
-                descriptionHash
-            );
-    }
-
-    /// @dev See {GovernorTimelockControl-_executor}.
-    function _executor()
-        internal
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (address)
-    {
-        return GovernorTimelockControl._executor();
-    }
-
     /// @dev Override and disable this function
     function castVote(uint256, uint8)
         public
         pure
-        override(Governor, IGovernor)
+        override(Governor)
         returns (uint256)
     {
         // solhint-disable-next-line reason-string
@@ -309,7 +261,7 @@ contract GovernorContract is
         uint256,
         uint8,
         string memory
-    ) public pure override(Governor, IGovernor) returns (uint256) {
+    ) public pure override(Governor) returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -320,7 +272,7 @@ contract GovernorContract is
         uint8,
         string calldata,
         bytes memory
-    ) public pure override(Governor, IGovernor) returns (uint256) {
+    ) public pure override(Governor) returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -332,7 +284,7 @@ contract GovernorContract is
         uint8,
         bytes32,
         bytes32
-    ) public pure override(Governor, IGovernor) returns (uint256) {
+    ) public pure override(Governor) returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -346,7 +298,7 @@ contract GovernorContract is
         uint8,
         bytes32,
         bytes32
-    ) public pure override(Governor, IGovernor) returns (uint256) {
+    ) public pure override(Governor) returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -355,9 +307,9 @@ contract GovernorContract is
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(Governor, GovernorTimelockControl)
+        override(Governor)
         returns (bool)
     {
-        return GovernorTimelockControl.supportsInterface(interfaceId);
+        return super.supportsInterface(interfaceId);
     }
 }

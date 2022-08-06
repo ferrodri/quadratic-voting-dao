@@ -1,5 +1,3 @@
-const { BigNumber } = require('ethers');
-
 module.exports = {
     DAO_MODERATORS: {
         NAME: 'Fernando',
@@ -67,9 +65,5 @@ module.exports = {
         // Quorum is specified as `numerator / denominator`. By default the denominator 
         // is 100.
         QUORUM_NUMERATOR_VALUE: 4
-    },
-    TIMELOCK: {
-        //Minimum delay in seconds for a timelock operation to become valid
-        MIN_DELAY: BigNumber.from(3600)
     }
 }
