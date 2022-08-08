@@ -1,4 +1,4 @@
-const { loadFixture, } = require('@nomicfoundation/hardhat-network-helpers');
+const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { expect } = require('chai');
 const { BigNumber } = require('ethers');
 const { moveBlocks } = require('./shared/utilities');
