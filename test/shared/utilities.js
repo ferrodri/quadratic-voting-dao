@@ -1,7 +1,7 @@
 module.exports = {
-    moveBlocks: async function (amount) {
+    moveBlocks: async (amount) => {
         for (let i = 0; i < amount; i++) {
             await network.provider.request({ method: 'evm_mine' });
-        }
+       }
     }
 }

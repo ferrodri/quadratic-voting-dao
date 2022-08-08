@@ -6,14 +6,14 @@ contract GovernanceToken is ERC20Votes {
 
     /// @dev Sets ERC20Votes total supply through ERC20Votes mint function, 
     /// total supply will be assigned to contract owner
-    constructor(uint256 _totalSupply)
-        ERC20('GovernanceToken', 'GT')
-        ERC20Permit('GovernanceToken')
+    constructor(
+        string memory name,
+        string memory symbol, 
+        uint256 totalSupply
+        )
+        ERC20(name, symbol)
+        ERC20Permit(name)
     {
-        _mint(msg.sender, _totalSupply);
-    }
-
-    function _mint(address to, uint256 amount) internal override(ERC20Votes) {
-        super._mint(to, amount);
+        _mint(msg.sender, totalSupply);
     }
 }
