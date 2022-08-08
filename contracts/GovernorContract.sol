@@ -71,6 +71,11 @@ contract GovernorContract is
 
     }
 
+    /**
+     * @dev Casts votes following quadratic voting formula.
+     *
+     * Emits a {LogVoteCasted} event.
+     */
     function vote(
         uint256 proposalId,
         uint256 weight,
@@ -115,7 +120,7 @@ contract GovernorContract is
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
-    ) public override(Governor) returns (uint256) {
+    ) public override returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
             'Votes below proposal threshold'
@@ -181,11 +186,41 @@ contract GovernorContract is
         return proposalId;
     }
 
+    /// @dev See {IGovernor-execute}.
+    function execute(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        bytes32 descriptionHash
+    ) public payable override returns (uint256) {
+        uint256 proposalId = hashProposal(
+            targets,
+            values,
+            calldatas,
+            descriptionHash
+        );
+
+        ProposalState status = state(proposalId);
+        require(
+            status == ProposalState.Succeeded || status == ProposalState.Queued,
+            'Proposal not successful'
+        );
+        _proposals[proposalId].executed = true;
+
+        emit ProposalExecuted(proposalId);
+
+        _beforeExecute(proposalId, targets, values, calldatas, descriptionHash);
+        _execute(proposalId, targets, values, calldatas, descriptionHash);
+        _afterExecute(proposalId, targets, values, calldatas, descriptionHash);
+
+        return proposalId;
+    }
+
     /// @dev See {IGovernor-state}.
     function state(uint256 proposalId)
         public
         view
-        override(Governor)
+        override
         returns (ProposalState)
     {
         ProposalCore storage proposal = _proposals[proposalId];
@@ -225,7 +260,7 @@ contract GovernorContract is
     function proposalSnapshot(uint256 proposalId)
         public
         view
-        override(Governor)
+        override
         returns (uint256)
     {
         return _proposals[proposalId].voteStart.getDeadline();
@@ -235,7 +270,7 @@ contract GovernorContract is
     function proposalDeadline(uint256 proposalId)
         public
         view
-        override(Governor)
+        override
         returns (uint256)
     {
         return _proposals[proposalId].voteEnd.getDeadline();
@@ -255,7 +290,7 @@ contract GovernorContract is
     function castVote(uint256, uint8)
         public
         pure
-        override(Governor)
+        override
         returns (uint256)
     {
         // solhint-disable-next-line reason-string
@@ -267,7 +302,7 @@ contract GovernorContract is
         uint256,
         uint8,
         string memory
-    ) public pure override(Governor) returns (uint256) {
+    ) public pure override returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -278,7 +313,7 @@ contract GovernorContract is
         uint8,
         string calldata,
         bytes memory
-    ) public pure override(Governor) returns (uint256) {
+    ) public pure override returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -290,7 +325,7 @@ contract GovernorContract is
         uint8,
         bytes32,
         bytes32
-    ) public pure override(Governor) returns (uint256) {
+    ) public pure override returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -304,7 +339,7 @@ contract GovernorContract is
         uint8,
         bytes32,
         bytes32
-    ) public pure override(Governor) returns (uint256) {
+    ) public pure override returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
@@ -313,7 +348,7 @@ contract GovernorContract is
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(Governor)
+        override
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

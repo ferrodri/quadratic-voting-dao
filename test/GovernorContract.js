@@ -10,7 +10,7 @@ const {
         INITIAL_VOTING_DELAY, INITIAL_VOTING_PERIOD, INITIAL_MINIMUM_VOTING_PERIOD
     }
 } = require('./shared/constants');
-// TODO: frh -> Set minimum for quadratic voting, test for moving tokens and weight
+// TODO: frh -> Test for moving tokens and weight
 
 // Example proposal description
 const proposalDescription = 'Example proposal description';
@@ -56,6 +56,7 @@ const createProposal = async (
     );
 
     return {
+        calldata,
         status: receipt.status,
         owner,
         proposalId: createProposalEvent[0].args.proposalId
@@ -350,7 +351,6 @@ describe('GovernorContract', function () {
             expect(_proposalState).to.equal(proposalState.defeated);
         });
 
-        // TODO: frh -> check how majority is reached, should be different
         it('Proposal should be defeated if majority is not reached', async () => {
             const {
                 GovernorContract, GovernanceToken, DAOModerators
@@ -371,14 +371,56 @@ describe('GovernorContract', function () {
             expect(_proposalState).to.equal(proposalState.defeated);
         });
 
-        // TODO: frh -> this tests
         it('Proposal should be successful if quorum and majority is reached',
             async () => {
+                const {
+                    GovernorContract, GovernanceToken, DAOModerators
+                } = await loadFixture(deployGovernorContractFixture);
+                const { proposalId } = await createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 0
+                );
+
+                await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+                await GovernorContract.vote(
+                    proposalId, weight.sufficient, support.for
+                );
+
+                await moveBlocks(INITIAL_VOTING_PERIOD + 1)
+
+                const _proposalState = await GovernorContract.state(proposalId);
+                expect(_proposalState).to.equal(proposalState.succeeded);
             }
         );
 
         it('Proposal should be executed and DAOModerators should be appointed',
             async () => {
+                const {
+                    GovernorContract, GovernanceToken, DAOModerators
+                } = await loadFixture(deployGovernorContractFixture);
+                const { proposalId, calldata } = await createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 0
+                );
+
+                await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+                await GovernorContract.vote(
+                    proposalId, weight.sufficient, support.for
+                );
+
+                await moveBlocks(INITIAL_VOTING_PERIOD + 1);
+
+                const descriptionHash = ethers.utils.id(proposalDescription);
+
+                await GovernorContract.execute(
+                    [DAOModerators.address], [0], [calldata], descriptionHash
+                );
+
+                const _proposalState = await GovernorContract.state(proposalId);
+                expect(_proposalState).to.equal(proposalState.executed);
+
+                const moderators = await DAOModerators.getModerators();
+                expect(moderators).to.have.lengthOf(2);
             }
         );
     });
