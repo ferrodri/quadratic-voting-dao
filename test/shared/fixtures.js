@@ -54,6 +54,9 @@ const deployGovernorContractFixture = async () => {
 
     await GovernorContract.deployed();
 
+    // Transfer ownership of DAOModerators to Governor
+    await DAOModerators.transferOwnership(GovernorContract.address);
+
     return { GovernorContract, GovernanceToken, DAOModerators };
 };
 
