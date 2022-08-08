@@ -10,7 +10,6 @@ const {
         INITIAL_VOTING_DELAY, INITIAL_VOTING_PERIOD, INITIAL_MINIMUM_VOTING_PERIOD
     }
 } = require('./shared/constants');
-// TODO: frh -> Test for moving tokens and weight
 
 // Example proposal description
 const proposalDescription = 'Example proposal description';
@@ -71,9 +70,6 @@ const getCalldata = (DAOModerators, moderatorIndex) => {
 }
 
 describe('GovernorContract', function () {
-    // TODO: frh -> do deployment
-    // describe('Deployment', function () {
-    // });
 
     describe('Creation of proposals', function () {
         it('Should create a proposal', async function () {
@@ -328,6 +324,35 @@ describe('GovernorContract', function () {
                 await GovernorContract.hasVoted(secondProposalId, owner)
             ).to.be.true;
         });
+
+        it('Should not be able to vote if received ERC20Votes during the voting period',
+            async function () {
+                const {
+                    GovernorContract, GovernanceToken, DAOModerators
+                } = await loadFixture(deployGovernorContractFixture);
+                const { proposalId } = await createProposal(
+                    GovernorContract, GovernanceToken, DAOModerators, 0
+                );
+
+                await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+                const [, other] = await ethers.getSigners();
+
+                const amount = TOTAL_SUPPLY / 3;
+                await GovernanceToken.transfer(
+                    other.address, BigNumber.from(amount)
+                );
+                expect(
+                    await GovernanceToken.balanceOf(other.address)
+                ).to.equal(amount);
+
+                await expect(
+                    GovernorContract.connect(other).vote(
+                        proposalId, weight.sufficient, support.for
+                    )
+                ).to.be.reverted;
+            }
+        );
     });
 
     describe('Proposal outcome', function () {
