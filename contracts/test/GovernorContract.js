@@ -1,6 +1,6 @@
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { expect } = require('chai');
-const { BigNumber, ethers } = require('ethers');
+const { BigNumber } = require('ethers');
 const { moveBlocks } = require('./shared/utilities');
 const { deployGovernorContractFixture } = require('./shared/fixtures');
 const {
@@ -40,7 +40,7 @@ const createProposal = async (
 ) => {
 
     const calldata = getCalldata(DAOModerators, moderatorIndex);
-
+    // eslint-disable-next-line no-undef
     const [{ address: owner }] = await ethers.getSigners();
     await GovernanceToken.delegate(owner);
 
@@ -106,8 +106,8 @@ describe('GovernorContract', function () {
             async function () {
                 const { GovernorContract, DAOModerators, GovernanceToken } =
                     await loadFixture(deployGovernorContractFixture);
-
                 const [{ address: owner }, { address: to }] =
+                    // eslint-disable-next-line no-undef
                     await ethers.getSigners();
                 await GovernanceToken.delegate(owner);
 
@@ -336,6 +336,7 @@ describe('GovernorContract', function () {
 
                 await moveBlocks(INITIAL_VOTING_DELAY + 1);
 
+                // eslint-disable-next-line no-undef
                 const [, other] = await ethers.getSigners();
 
                 const amount = TOTAL_SUPPLY / 3;
@@ -435,6 +436,7 @@ describe('GovernorContract', function () {
 
                 await moveBlocks(INITIAL_VOTING_PERIOD + 1);
 
+                // eslint-disable-next-line no-undef
                 const descriptionHash = ethers.utils.id(proposalDescription);
 
                 await GovernorContract.execute(

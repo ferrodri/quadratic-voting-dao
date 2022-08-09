@@ -1,6 +1,6 @@
 const { loadFixture, } = require('@nomicfoundation/hardhat-network-helpers');
 const { expect } = require('chai');
-const { BigNumber, ethers } = require('ethers');
+const { BigNumber } = require('ethers');
 const { moveBlocks } = require('./shared/utilities');
 const { deployGovernanceTokenFixture } = require('./shared/fixtures');
 const { GOVERNANCE_TOKEN: { TOTAL_SUPPLY } } = require('./shared/constants');
@@ -11,9 +11,10 @@ describe('GovernanceToken', function () {
     describe('Deployment', function () {
         it('Should set the right total supply of checkpoints(voting power)',
             async function () {
-                const GovernanceToken = 
+                const GovernanceToken =
                     await loadFixture(deployGovernanceTokenFixture);
                 await moveBlocks(1);
+                // eslint-disable-next-line no-undef
                 const { number } = await ethers.provider.getBlock('latest');
                 expect(
                     await GovernanceToken.getPastTotalSupply(number - 1)
@@ -22,8 +23,9 @@ describe('GovernanceToken', function () {
         );
 
         it('Owner ERC20Votes balance should equal total supply', async function () {
-            const GovernanceToken = 
+            const GovernanceToken =
                 await loadFixture(deployGovernanceTokenFixture);
+            // eslint-disable-next-line no-undef
             const [{ address: owner }] = await ethers.getSigners();
             expect(
                 await GovernanceToken.balanceOf(owner)
@@ -33,8 +35,9 @@ describe('GovernanceToken', function () {
 
     describe('Delegation and transfer of ERC20Votes', function () {
         it('Owner should delegate voting power to himself', async function () {
-            const GovernanceToken = 
+            const GovernanceToken =
                 await loadFixture(deployGovernanceTokenFixture);
+            // eslint-disable-next-line no-undef
             const [{ address: owner }] = await ethers.getSigners();
             await GovernanceToken.delegate(owner);
             expect(await GovernanceToken.getVotes(owner)).to.equal(TOTAL_SUPPLY);
@@ -42,8 +45,9 @@ describe('GovernanceToken', function () {
 
         it('Owner should transfer a third of ERC20Votes to another address',
             async function () {
-                const GovernanceToken = 
+                const GovernanceToken =
                     await loadFixture(deployGovernanceTokenFixture);
+                // eslint-disable-next-line no-undef
                 const [, { address: to }] = await ethers.getSigners();
                 const amount = TOTAL_SUPPLY / 3;
                 await GovernanceToken.transfer(
@@ -55,8 +59,9 @@ describe('GovernanceToken', function () {
 
         it('Transfer should fail if transfer amount is more than ERC20Votes balance',
             async function () {
-                const GovernanceToken = 
+                const GovernanceToken =
                     await loadFixture(deployGovernanceTokenFixture);
+                // eslint-disable-next-line no-undef
                 const [, { address: to }] = await ethers.getSigners();
                 const amount = TOTAL_SUPPLY + 50;
                 await expect(

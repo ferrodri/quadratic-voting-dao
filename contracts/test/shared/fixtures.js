@@ -1,4 +1,3 @@
-const { ethers } = require('ethers');
 const {
     DAO_MODERATORS: { NAME, EMAIL, MODERATOR_ADDRESS },
     GOVERNANCE_TOKEN: { NAME: GOVERNANCE_TOKEN_NAME, SYMBOL, TOTAL_SUPPLY },
@@ -10,6 +9,7 @@ const {
 } = require('./constants');
 
 const deployDAOModeratorsFixture = async () => {
+    // eslint-disable-next-line no-undef
     const DAOModeratorsFactory = await ethers
         .getContractFactory('DAOModerators');
 
@@ -23,6 +23,7 @@ const deployDAOModeratorsFixture = async () => {
 };
 
 const deployGovernanceTokenFixture = async () => {
+    // eslint-disable-next-line no-undef
     const governanceTokenFactory = await ethers
         .getContractFactory('GovernanceToken');
 
@@ -40,6 +41,7 @@ const deployGovernorContractFixture = async () => {
     const DAOModerators = await deployDAOModeratorsFixture();
     const GovernanceToken = await deployGovernanceTokenFixture();
 
+    // eslint-disable-next-line no-undef
     const GovernorFactory = await ethers.getContractFactory('GovernorContract');
 
     const GovernorContract =
