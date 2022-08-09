@@ -66,4 +66,4 @@ module.exports = {
         // is 100.
         QUORUM_NUMERATOR_VALUE: 4
     }
-}
+};

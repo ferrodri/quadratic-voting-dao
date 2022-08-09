@@ -21,7 +21,7 @@ describe('GovernanceToken', function () {
             }
         );
 
-        it("Owner's ERC20Votes balance should equal total supply", async function () {
+        it('Owner ERC20Votes balance should equal total supply', async function () {
             const GovernanceToken = 
                 await loadFixture(deployGovernanceTokenFixture);
             const [{ address: owner }] = await ethers.getSigners();

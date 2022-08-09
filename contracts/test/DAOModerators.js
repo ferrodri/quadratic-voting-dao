@@ -5,9 +5,9 @@ const { DAO_MODERATORS: { NEW_MODERATORS } } = require('./shared/constants');
 const { NAME, EMAIL, MODERATOR_ADDRESS } = NEW_MODERATORS[0];
 
 
-describe('DAOModerators', async () => {
+describe('DAOModerators', () => {
 
-    describe('Flux', function () {
+    describe('Flux', () => {
         it('Should get current moderators', async () => {
             const DAOModerators = await loadFixture(deployDAOModeratorsFixture);
             const moderators = await DAOModerators.getModerators();
