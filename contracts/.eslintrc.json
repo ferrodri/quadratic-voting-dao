@@ -10,11 +10,8 @@
         "eslint:recommended"
     ],
     "parserOptions": {
-        "ecmaVersion": 2018
+        "ecmaVersion": 2022
     },
-    "plugins": [
-        "chai-friendly"
-    ],
     "rules": {
         "no-console": "off",
         "curly": "warn",

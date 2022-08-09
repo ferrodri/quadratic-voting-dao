@@ -1,3 +1,4 @@
+const { ethers } = require('ethers');
 const {
     DAO_MODERATORS: { NAME, EMAIL, MODERATOR_ADDRESS },
     GOVERNANCE_TOKEN: { NAME: GOVERNANCE_TOKEN_NAME, SYMBOL, TOTAL_SUPPLY },
