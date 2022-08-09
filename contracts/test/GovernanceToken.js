@@ -1,6 +1,6 @@
 const { loadFixture, } = require('@nomicfoundation/hardhat-network-helpers');
 const { expect } = require('chai');
-const { BigNumber } = require('ethers');
+const { BigNumber, ethers } = require('ethers');
 const { moveBlocks } = require('./shared/utilities');
 const { deployGovernanceTokenFixture } = require('./shared/fixtures');
 const { GOVERNANCE_TOKEN: { TOTAL_SUPPLY } } = require('./shared/constants');

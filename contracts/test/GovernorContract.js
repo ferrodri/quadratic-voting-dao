@@ -1,6 +1,6 @@
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { expect } = require('chai');
-const { BigNumber } = require('ethers');
+const { BigNumber, ethers } = require('ethers');
 const { moveBlocks } = require('./shared/utilities');
 const { deployGovernorContractFixture } = require('./shared/fixtures');
 const {
@@ -18,12 +18,12 @@ const weight = {
     sufficientTwoProposals: 10,
     exceeded: 20,
     notQuorum: 2
-}
+};
 const support = {
     against: 0,
     for: 1,
     abstain: 2
-}
+};
 const proposalState = {
     pending: 0,
     active: 1,
@@ -33,7 +33,7 @@ const proposalState = {
     queued: 5,
     expired: 6,
     executed: 7
-}
+};
 
 const createProposal = async (
     GovernorContract, GovernanceToken, DAOModerators, moderatorIndex
@@ -60,14 +60,14 @@ const createProposal = async (
         owner,
         proposalId: createProposalEvent[0].args.proposalId
     };
-}
+};
 
 const getCalldata = (DAOModerators, moderatorIndex) => {
     const { NAME, EMAIL, MODERATOR_ADDRESS } = NEW_MODERATORS[moderatorIndex];
     return DAOModerators.interface.encodeFunctionData(
         SET_NEW_MODERATOR_FN, [NAME, EMAIL, MODERATOR_ADDRESS]
     );
-}
+};
 
 describe('GovernorContract', function () {
 
@@ -370,7 +370,7 @@ describe('GovernorContract', function () {
                 proposalId, weight.notQuorum, support.for
             );
 
-            await moveBlocks(INITIAL_VOTING_PERIOD + 1)
+            await moveBlocks(INITIAL_VOTING_PERIOD + 1);
 
             const _proposalState = await GovernorContract.state(proposalId);
             expect(_proposalState).to.equal(proposalState.defeated);
@@ -390,7 +390,7 @@ describe('GovernorContract', function () {
                 proposalId, weight.sufficient, support.against
             );
 
-            await moveBlocks(INITIAL_VOTING_PERIOD + 1)
+            await moveBlocks(INITIAL_VOTING_PERIOD + 1);
 
             const _proposalState = await GovernorContract.state(proposalId);
             expect(_proposalState).to.equal(proposalState.defeated);
@@ -411,7 +411,7 @@ describe('GovernorContract', function () {
                     proposalId, weight.sufficient, support.for
                 );
 
-                await moveBlocks(INITIAL_VOTING_PERIOD + 1)
+                await moveBlocks(INITIAL_VOTING_PERIOD + 1);
 
                 const _proposalState = await GovernorContract.state(proposalId);
                 expect(_proposalState).to.equal(proposalState.succeeded);
