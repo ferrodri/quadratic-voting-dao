@@ -1,9 +1,9 @@
 const {
     DAO_MODERATORS: { NAME, EMAIL, MODERATOR_ADDRESS },
     GOVERNANCE_TOKEN: { NAME: GOVERNANCE_TOKEN_NAME, SYMBOL, TOTAL_SUPPLY },
-    GOVERNOR_CONTRACT: { 
-        NAME: GOVERNOR_CONTRACT_NAME,  INITIAL_VOTING_DELAY, 
-        INITIAL_VOTING_PERIOD, INITIAL_MINIMUM_VOTING_PERIOD, 
+    GOVERNOR_CONTRACT: {
+        NAME: GOVERNOR_CONTRACT_NAME, INITIAL_VOTING_DELAY,
+        INITIAL_VOTING_PERIOD, INITIAL_MINIMUM_VOTING_PERIOD,
         INITIAL_PROPOSAL_THRESHOLD, QUORUM_NUMERATOR_VALUE
     }
 } = require('./constants');
@@ -63,4 +63,4 @@ const deployGovernorContractFixture = async () => {
 module.exports = {
     deployDAOModeratorsFixture, deployGovernanceTokenFixture,
     deployGovernorContractFixture
-}
+};

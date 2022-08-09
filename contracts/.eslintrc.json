@@ -1,0 +1,42 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true,
+        "jest": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "plugins": [
+        "chai-friendly"
+    ],
+    "rules": {
+        "no-console": "off",
+        "curly": "warn",
+        "no-unused-vars": "warn",
+        "no-dupe-else-if": "error",
+        "no-import-assign": "error",
+        "no-setter-return": "error",
+        "require-await": "error",
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "semi": [
+            "error",
+            "always"
+        ]
+    }
+}
