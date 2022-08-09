@@ -5,11 +5,17 @@
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
 const { deployGovernorContractFixture } = require('../test/shared/fixtures');
+const { moveBlocks } = require('../test/shared/utilities');
 
 async function main() {
     const {
         GovernorContract, GovernanceToken, DAOModerators
     } = await deployGovernorContractFixture();
+    // eslint-disable-next-line no-undef
+    const [{ address: owner }] = await ethers.getSigners();
+    await GovernanceToken.delegate(owner);
+    await moveBlocks(1);
+
     console.log('GovernorContract deployed to:', GovernorContract.address);
     console.log('GovernanceToken deployed to:', GovernanceToken.address);
     console.log('DAOModerators deployed to:', DAOModerators.address);

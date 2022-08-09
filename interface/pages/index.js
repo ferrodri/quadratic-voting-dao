@@ -2,7 +2,9 @@ import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import * as React from 'react';
 import { useAccount } from 'wagmi';
-import { Account, Connect, DAOModerators } from '../components';
+import { 
+    Account, AvailableVotingPower, Connect, DAOModerators, TotalVotingPower 
+} from '../components';
 import { useIsMounted } from '../hooks';
 
 function Home() {
@@ -25,7 +27,13 @@ function Home() {
                     <Connect />
                     <DAOModerators />
 
-                    {isMounted && isConnected && ( <> <Account /> </> )}
+                    {isMounted && isConnected && (
+                        <>
+                            <Account />
+                            <TotalVotingPower/>
+                            <AvailableVotingPower/>
+                        </>
+                    )}
                 </>
             </main>
         </div>

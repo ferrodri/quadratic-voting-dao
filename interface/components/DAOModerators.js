@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useContractRead } from 'wagmi';
 import DAOModeratorsABI from '../../contracts/artifacts/contracts/DAOModerators.sol/DAOModerators.json';
+import { DAOModeratorsAddress } from '../shared/constants';
 
 export function DAOModerators() {
     const [isLoading, setIsLoading] = useState(true);
@@ -8,7 +9,7 @@ export function DAOModerators() {
     const [error, setError] = useState('');
 
     useContractRead({
-        addressOrName: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+        addressOrName: DAOModeratorsAddress,
         contractInterface: DAOModeratorsABI.abi,
         functionName: 'getModerators',
         onSuccess(data) {
@@ -26,12 +27,12 @@ export function DAOModerators() {
         <>
             {error && error}
             {isLoading && <span>Loading DAO Moderators ...</span>}
-            {data.length > 0 && data.map(moderator =>
-                <>
+            {data.length > 0 && data.map((moderator, i) =>
+                <div key={i}>
                     <span>Name: {moderator.name}</span>
                     <span>Email: {moderator.email}</span>
                     <span>Address: {moderator.moderatorAddress}</span>
-                </>
+                </div>
             )}
         </>
     );

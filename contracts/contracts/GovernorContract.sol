@@ -71,6 +71,24 @@ contract GovernorContract is
 
     }
 
+    /// @dev Returns votes available for voting in this voting period
+    function getAvailableVotingPower() public view returns (uint256) {
+        address account = _msgSender();
+
+        if (_currentPeriodVoteStart.isUnset()) {
+            return _getVotes(account, block.number - 1, _defaultParams());
+        } else {
+            uint256 _totalWeight = _getVotes(
+                account,
+                _currentPeriodVoteStart.getDeadline(),
+                _defaultParams()
+            );
+            return
+                _totalWeight -
+                _castedVotes[_currentPeriodVoteStart.getDeadline()][account];
+        }
+    }
+
     /**
      * @dev Casts votes following quadratic voting formula.
      *
@@ -287,12 +305,7 @@ contract GovernorContract is
     }
 
     /// @dev Override and disable this function
-    function castVote(uint256, uint8)
-        public
-        pure
-        override
-        returns (uint256)
-    {
+    function castVote(uint256, uint8) public pure override returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
