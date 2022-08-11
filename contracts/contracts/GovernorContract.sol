@@ -36,9 +36,7 @@ contract GovernorContract is
     using SafeCast for uint256;
     using Timers for Timers.BlockNumber;
 
-    /**
-     * @dev Emitted when a vote is casted
-     */
+    /// @dev Emitted when a vote is casted
     event LogVoteCasted(
         address voter,
         uint256 proposalId,
