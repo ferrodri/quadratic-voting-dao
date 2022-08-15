@@ -52,7 +52,11 @@ export function ProposeForm() {
             toast({
                 title: 'Proposal submitted correctly!',
                 status: 'success',
-                duration: 9000
+                duration: 9000,
+                containerStyle: {
+                    maxHeight: '500px'
+                },
+                isClosable: true
             });
         },
         onError(error) {
@@ -60,7 +64,11 @@ export function ProposeForm() {
                 title: 'Error submitting the proposal',
                 description: (error.message ? error.message : JSON.stringify(error)),
                 status: 'error',
-                duration: 9000
+                duration: 9000,
+                containerStyle: {
+                    maxHeight: '500px'
+                },
+                isClosable: true
             });
         }
     });

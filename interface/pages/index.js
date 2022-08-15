@@ -28,17 +28,20 @@ function Home() {
                     <>
                         <Connect />
                         <DAOModerators />
-                        <ListProposals />
-                        <ListProposals onlyActive />
 
-                        {isMounted && isConnected && (
-                            <>
-                                <Account />
-                                <TotalVotingPower />
-                                <AvailableVotingPower />
-                                <ProposeForm />
-                            </>
-                        )}
+                        {isMounted && isConnected
+                            ? (
+                                <>
+                                    <Account />
+                                    <TotalVotingPower />
+                                    <AvailableVotingPower>
+                                        <ListProposals onlyActive />
+                                    </AvailableVotingPower>
+                                    <ProposeForm />
+                                </>
+                            )
+                            : <ListProposals />
+                        }
                     </>
                 </Container>
             </main>

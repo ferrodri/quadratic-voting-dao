@@ -3,9 +3,9 @@ import { ethers } from 'ethers';
 import { useBlockNumber, useContractRead, useProvider } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import { GovernorContractAddress } from '../shared/constants';
-import { ProposalBlockTimestamp, ProposalState } from './index';
+import { Proposal } from './index';
 
-export function ListProposals({ onlyActive }) {
+export function ListProposals({ onlyActive, availableVoting }) {
     const provider = useProvider();
     const { data: blockNumber } = useBlockNumber({ watch: true });
     const [proposals, setProposals] = useState([]);
@@ -25,12 +25,13 @@ export function ListProposals({ onlyActive }) {
             GovernorContractAddress, GovernorContractABI.abi, provider
         );
         let eventFilter = governorContract.filters.ProposalCreated();
+        const blockMinusVotingPeriod = blockNumber - votingPeriod;
 
         provider.getLogs({
             ...eventFilter,
             fromBlock:
                 onlyActive && votingPeriod !== 0
-                    ? blockNumber - votingPeriod
+                    ? blockMinusVotingPeriod > 0 ? blockMinusVotingPeriod : 0
                     : 'earliest',
             toBlock: 'latest'
         }).then(logs => {
@@ -58,13 +59,11 @@ export function ListProposals({ onlyActive }) {
     return (
         <>
             {proposals.length > 0 && proposals.map((proposal, i) =>
-                <div key={i}>
-                    <span>Proposal Id: {proposal.proposalId.toString()}</span>
-                    <span>Proposal description: {proposal.description}</span>
-                    <ProposalBlockTimestamp blockTimestamp={proposal.snapshot} />
-                    <ProposalBlockTimestamp blockTimestamp={proposal.deadline} deadline />
-                    <ProposalState proposalId={proposal.proposalId} />
-                </div>
+                <Proposal
+                    key={i}
+                    proposal={proposal}
+                    availableVoting={availableVoting}
+                />
             )}
         </>
     );

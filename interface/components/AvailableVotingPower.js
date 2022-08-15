@@ -1,9 +1,10 @@
+import React from 'react';
 import { useState } from 'react';
 import { useContractRead } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import { GovernorContractAddress } from '../shared/constants';
 
-export function AvailableVotingPower() {
+export function AvailableVotingPower({ children }) {
     const [isLoading, setIsLoading] = useState(true);
     const [availableVoting, setAvailableVoting] = useState(0);
     const [error, setError] = useState('');
@@ -19,7 +20,8 @@ export function AvailableVotingPower() {
         onError(error) {
             setIsLoading(false);
             setError(error);
-        }
+        },
+        watch: true
     });
 
     return (
@@ -27,6 +29,7 @@ export function AvailableVotingPower() {
             {error && error}
             {isLoading && <span>Loading available voting power...</span>}
             <span>Available voting power: {availableVoting} votes</span>
+            {React.cloneElement(children, { availableVoting: availableVoting })}
         </>
     );
 }

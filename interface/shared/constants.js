@@ -16,3 +16,9 @@ export const proposalStateEnum = {
     6: 'Expired',
     7: 'Executed'
 };
+
+export const supportEnum = {
+    0: 'Against',
+    1: 'For', 
+    2: 'Abstain'
+};

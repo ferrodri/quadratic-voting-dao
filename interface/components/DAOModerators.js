@@ -19,8 +19,8 @@ export function DAOModerators() {
         onError(error) {
             setIsLoading(false);
             setError(error);
-        }
-        // TODO: frh -> styles and test if needed watch: true
+        },
+        watch: true
     });
 
     return (

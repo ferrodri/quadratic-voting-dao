@@ -21,7 +21,8 @@ export function TotalVotingPower() {
         onError(error) {
             setIsLoading(false);
             setError(error);
-        }
+        },
+        watch: true
     });
 
     return (

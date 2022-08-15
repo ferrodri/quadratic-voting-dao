@@ -13,12 +13,12 @@ export const globalCSS = {
             },
             button: {
                 fontWeight: 'bold',
-                border: '#2d2d2d 1px solid',
+                border: '1px solid #2d2d2d',
                 borderRadius: '23px',
                 padding: '8px 22px'
             },
             'button:hover': {
-                border: 'white 1px solid',
+                border: '1px solid white',
             }
         }
     }
