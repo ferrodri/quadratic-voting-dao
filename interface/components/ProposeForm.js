@@ -2,7 +2,6 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Container,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -75,10 +74,9 @@ export function ProposeForm() {
 
     return (
         <>
-            <Container centerContent margin='32px auto'>
-                Propose a new moderator for the DAO
-                <button onClick={onOpen}>Propose</button>
-            </Container>
+            <button style={{ margin: '0 16px' }} onClick={onOpen} >
+                Propose a new moderator
+            </button>
             <Modal isOpen={isOpen} onClose={onClose} >
                 <ModalOverlay
                     bg='#211f24'

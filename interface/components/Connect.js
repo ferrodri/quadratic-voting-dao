@@ -13,7 +13,7 @@ export function Connect() {
             <>
                 {isConnected && (
                     <button onClick={() => disconnect()}>
-                        Disconnect from {connector?.name}
+                        Logout
                     </button>
                 )}
 
@@ -21,7 +21,7 @@ export function Connect() {
                     .filter((x) => isMounted && x.ready && x.id !== connector?.id)
                     .map((x) => (
                         <button key={x.id} onClick={() => connect({ connector: x })}>
-                            {x.name}
+                            Connect with {x.name}
                             {isLoading && x.id === pendingConnector?.id && ' (connecting)'}
                         </button>
                     ))}

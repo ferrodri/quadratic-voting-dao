@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { Heading } from '@chakra-ui/react';
 import { useBlockNumber, useContractRead, useProvider } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import { GovernorContractAddress } from '../shared/constants';
@@ -58,6 +59,9 @@ export function ListProposals({ onlyActive, availableVoting }) {
 
     return (
         <>
+            <Heading as='h2' size='lg' noOfLines={1} padding='16px 0' textAlign='center'>
+                {onlyActive ? 'Active proposals' : 'DAO proposals'}
+            </Heading>
             {proposals.length > 0 && proposals.map((proposal, i) =>
                 <Proposal
                     key={i}
