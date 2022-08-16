@@ -22,7 +22,7 @@ import { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 import { BigNumber, ethers } from 'ethers';
 import * as Yup from 'yup';
-import { useContractRead, useContractWrite } from 'wagmi';
+import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import {
     DAOModeratorsAddress, GovernorContractAddress, supportEnum, proposalStateEnum
@@ -32,6 +32,8 @@ import { ProposalBlockTimestamp, ProposalVotes, TotalVotingPower } from './index
 export function Proposal(
     { availableVoting = 0, hasVoted = false, proposal, onlySuccessful, }
 ) {
+    const { isConnected } = useAccount();
+    const [justVoted, setJustVoted] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [proposalState, setProposalState] = useState('');
     const [error, setError] = useState('');
@@ -74,7 +76,7 @@ export function Proposal(
         contractInterface: GovernorContractABI.abi,
         functionName: 'vote',
         onSuccess() {
-            setHasVoted(true);
+            setJustVoted(true);
             toast({
                 title: 'Vote submitted succesfully',
                 status: 'success',
@@ -104,7 +106,6 @@ export function Proposal(
         contractInterface: GovernorContractABI.abi,
         functionName: 'execute',
         onSuccess() {
-            setHasVoted(true);
             toast({
                 title: 'Proposal executed succesfully',
                 status: 'success',
@@ -126,7 +127,9 @@ export function Proposal(
         }
     });
 
-    const canVote = proposalState === 'Active' && !hasVoted && _availableVoting !== 0;
+    const canVote =
+        proposalState === 'Active' && _availableVoting !== 0 && hasVoted
+            ? !hasVoted : !justVoted;
 
     function handleVote() {
         if (canVote) { onOpen(); }
@@ -161,7 +164,7 @@ export function Proposal(
                                 <InfoIcon /> {proposalState}
                             </p>
                             {
-                                hasVoted && <p>
+                                (hasVoted || justVoted) && <p>
                                     <CheckIcon color='blue' /> Vote casted
                                 </p>
                             }
@@ -169,8 +172,8 @@ export function Proposal(
                     </Grid>
 
                     {
-                        canVote &&
-                        <Container display='flex' justifyContent='space-around' marginTop='16px'>
+                        canVote && isConnected
+                        && <Container display='flex' justifyContent='space-around' marginTop='16px'>
                             <div>
                                 <TotalVotingPower />
                                 <p><UnlockIcon /> <b>Available votes:</b> {availableVoting} votes</p>

@@ -11,7 +11,6 @@ export function ProposalVotes({ proposalId }) {
     const [againstVotes, setAgainstVotes] = useState(0);
     const [forVotes, setForVotes] = useState(0);
 
-
     useContractRead({
         addressOrName: GovernorContractAddress,
         contractInterface: GovernorContractABI.abi,

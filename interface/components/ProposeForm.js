@@ -25,8 +25,7 @@ const ProposeSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Required'),
     moderatorAddress: Yup
         .string()
-        // TODO: frh -> improve wallet address regex
-        .matches(/^0x[a-fA-F0-9]{40}$/g, 'Wallet address not correct')
+        .test((address) => ethers.utils.isAddress(address))
         .required('Required')
 });
 
@@ -36,7 +35,6 @@ const getCalldata = (name, email, moderatorAddress) => {
         'setNewModerator', [name, email, moderatorAddress]
     );
 };
-
 
 export function ProposeForm() {
     const { isOpen, onOpen, onClose } = useDisclosure();

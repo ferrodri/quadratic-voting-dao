@@ -26,6 +26,12 @@ export const globalCSS = {
             '.primary-button:hover': {
                 border: '1px solid #3546F2',
                 background: '#3546F2'
+            },
+            '.css-192lbzy': {
+                border: '1px solid white'
+            },
+            '.chakra-alert__title': {
+                paddingRight: '16px'
             }
         }
     }
