@@ -28,7 +28,6 @@ export function AvailableVotingPower({ children }) {
         <>
             {error && error}
             {isLoading && <span>Loading available voting power...</span>}
-            <span>Available voting power: {availableVoting} votes</span>
             {React.cloneElement(children, { availableVoting: availableVoting })}
         </>
     );

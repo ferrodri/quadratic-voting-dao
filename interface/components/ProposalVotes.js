@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useContractRead } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import { GovernorContractAddress } from '../shared/constants';
+import { CheckIcon, CloseIcon, MinusIcon } from '@chakra-ui/icons';
 
 export function ProposalVotes({ proposalId }) {
     const [isLoading, setIsLoading] = useState(true);
@@ -37,10 +38,10 @@ export function ProposalVotes({ proposalId }) {
     return (
         <>
             {error && error}
-            {isLoading && <span>Loading proposal votes ...</span>}
-            <span>Abstain votes {abstainVotes}</span>
-            <span>Against votes {againstVotes}</span>
-            <span>For votes {forVotes}</span>
+            {isLoading && <p>Loading proposal votes ...</p>}
+            <p><CheckIcon color='green'/> <b>For: </b>{forVotes} votes</p>
+            <p><CloseIcon color='red'/> <b>Against: </b>{againstVotes} votes</p>
+            <p><MinusIcon/> <b>Abstain: </b>{abstainVotes} votes</p>
         </>
     );
 }

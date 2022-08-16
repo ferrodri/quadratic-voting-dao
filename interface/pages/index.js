@@ -2,10 +2,10 @@ import Head from 'next/head';
 import * as React from 'react';
 import { useAccount } from 'wagmi';
 import {
-    AvailableVotingPower, DAOModerators, Header, ListProposals, TotalVotingPower
+    AvailableVotingPower, DAOModerators, Header, ListProposals
 } from '../components';
 import { useIsMounted } from '../hooks';
-import { Grid, GridItem } from '@chakra-ui/react';
+import { Heading, Grid, GridItem } from '@chakra-ui/react';
 
 function Home() {
     const isMounted = useIsMounted();
@@ -40,13 +40,33 @@ function Home() {
                         {isMounted && isConnected
                             ? (
                                 <>
-                                    <TotalVotingPower />
+                                    <Heading
+                                        as='h2'
+                                        size='lg'
+                                        noOfLines={1}
+                                        padding='16px 0'
+                                        textAlign='center'
+                                    >
+                                        Active or successful proposals
+                                    </Heading>
                                     <AvailableVotingPower>
                                         <ListProposals onlyActive />
                                     </AvailableVotingPower>
+                                    <ListProposals onlySuccessful />
                                 </>
                             )
-                            : <ListProposals />
+                            : <>
+                                <Heading
+                                    as='h2'
+                                    size='lg'
+                                    noOfLines={1}
+                                    padding='16px 0'
+                                    textAlign='center'
+                                >
+                                    DAO proposals
+                                </Heading>
+                                <ListProposals />
+                            </>
                         }
                     </GridItem>
                     <GridItem colSpan={1} />

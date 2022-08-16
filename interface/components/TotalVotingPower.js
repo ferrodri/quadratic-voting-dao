@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAccount, useContractRead } from 'wagmi';
 import GovernanceTokenABI from '../../contracts/artifacts/contracts/GovernanceToken.sol/GovernanceToken.json';
 import { GovernanceTokenAddress } from '../shared/constants';
+import { LockIcon } from '@chakra-ui/icons';
 
 export function TotalVotingPower() {
     const { address } = useAccount();
@@ -29,7 +30,7 @@ export function TotalVotingPower() {
         <>
             {error && error}
             {isLoading && <span>Loading total voting power balance ...</span>}
-            <span>Total voting power: {totalVoting} votes</span>
+            <p><LockIcon/> <b>Total voting power:</b> {totalVoting} votes</p>
         </>
     );
 }

@@ -19,6 +19,13 @@ export const globalCSS = {
             },
             'button:hover': {
                 border: '1px solid white',
+            },
+            '.primary-button': {
+                background: '#384aff'
+            },
+            '.primary-button:hover': {
+                border: '1px solid #3546F2',
+                background: '#3546F2'
             }
         }
     }

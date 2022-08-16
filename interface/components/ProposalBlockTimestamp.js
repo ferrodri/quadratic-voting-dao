@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useProvider, useBlockNumber } from 'wagmi';;
+import { TimeIcon } from '@chakra-ui/icons';
 
 export function ProposalBlockTimestamp({ blockTimestamp, deadline }) {
     const _blockTimestamp = blockTimestamp._isBigNumber
@@ -19,12 +20,13 @@ export function ProposalBlockTimestamp({ blockTimestamp, deadline }) {
 
     return (
         <>
-            <span>
+            <p>
+                <TimeIcon />
                 {blockNumber > _blockTimestamp
-                    ? `Proposal ${deadline ? 'ended' : 'started'} on ${timestamp}`
-                    : `Proposal will ${deadline ? 'end' : 'start'} on block ${_blockTimestamp}, current block number ${blockNumber}`
+                    ? `${deadline ? ' Ended' : ' Started'} on ${timestamp}`
+                    : ` Proposal will ${deadline ? 'end' : 'start'} in ${_blockTimestamp - blockNumber} blocks`
                 }
-            </span>
+            </p>
         </>
     );
 }

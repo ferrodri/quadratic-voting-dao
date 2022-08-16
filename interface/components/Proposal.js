@@ -1,7 +1,11 @@
 import {
     Box,
+    Container,
     FormControl,
     FormLabel,
+    Grid,
+    GridItem,
+    Heading,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -13,25 +17,26 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react';
+import { CheckIcon, InfoIcon, UnlockIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import * as Yup from 'yup';
 import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import {
-    GovernorContractAddress, supportEnum, proposalStateEnum
+    DAOModeratorsAddress, GovernorContractAddress, supportEnum, proposalStateEnum
 } from '../shared/constants';
-import { ProposalBlockTimestamp, ProposalVotes } from './index';
+import { ProposalBlockTimestamp, ProposalVotes, TotalVotingPower } from './index';
 
-export function Proposal({ proposal, availableVoting = 0 }) {
+export function Proposal({ proposal, onlySuccessful, availableVoting = 0 }) {
     const { address } = useAccount();
     const [isLoading, setIsLoading] = useState(true);
     const [proposalState, setProposalState] = useState('');
     const [error, setError] = useState('');
     const [hasVoted, setHasVoted] = useState(false);
 
-    const { deadline, description, snapshot, proposalId } = proposal;
+    const { calldatas, deadline, description, proposalId, snapshot } = proposal;
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
@@ -52,7 +57,7 @@ export function Proposal({ proposal, availableVoting = 0 }) {
         args: proposalId,
         onSuccess(data) {
             setIsLoading(false);
-            if (data) {
+            if (data || data === 0) {
                 setProposalState(proposalStateEnum[data]);
             };
         },
@@ -102,6 +107,36 @@ export function Proposal({ proposal, availableVoting = 0 }) {
         }
     });
 
+    const descriptionHash = ethers.utils.id(description);
+
+    const { write: execute } = useContractWrite({
+        mode: 'recklesslyUnprepared',
+        addressOrName: GovernorContractAddress,
+        contractInterface: GovernorContractABI.abi,
+        functionName: 'execute',
+        onSuccess() {
+            setHasVoted(true);
+            toast({
+                title: 'Proposal executed succesfully',
+                status: 'success',
+                duration: 9000,
+                isClosable: true
+            });
+        },
+        onError(error) {
+            toast({
+                title: 'Error executing proposal',
+                description: (error.message ? error.message : JSON.stringify(error)),
+                status: 'error',
+                duration: 9000,
+                containerStyle: {
+                    maxHeight: '500px'
+                },
+                isClosable: true
+            });
+        }
+    });
+
     const canVote = proposalState === 'Active' && !hasVoted && _availableVoting !== 0;
 
     function handleVote() {
@@ -112,25 +147,69 @@ export function Proposal({ proposal, availableVoting = 0 }) {
         <>
             {error && error}
             {isLoading && <span>Loading proposal state ...</span>}
-            <Box
-                border='1px solid #2d2d2d'
-                margin='12px'
-                padding='24px'
-                borderRadius='12px'
-                cursor={canVote ? 'pointer' : address ? 'not-allowed' : 'auto'}
-                _hover={{
-                    border: canVote ? '1px solid white' : 'auto'
-                }}
-                onClick={handleVote}
-            >
-                <span>Proposal Id: {proposalId.toString()}</span>
-                <span>Proposal description: {description}</span>
-                <ProposalBlockTimestamp blockTimestamp={snapshot} />
-                <ProposalBlockTimestamp blockTimestamp={deadline} deadline />
-                <span>Proposal state: {proposalState}</span>
-                <ProposalVotes proposalId={proposalId} />
-                {hasVoted && <span>You have already voted for this proposal</span>}
-            </Box>
+            {
+                (
+                    (onlySuccessful && proposalState === 'Succeeded')
+                    || !onlySuccessful
+                )
+                && <Box
+                    border='1px solid #2d2d2d'
+                    margin='12px'
+                    padding='24px'
+                    borderRadius='12px'
+                >
+                    <Heading as='h3' size='sm' marginBottom='16px'>
+                        {description}
+                    </Heading>
+                    <Grid templateColumns='repeat(12, 1fr)' gap={4} >
+                        <GridItem colSpan={6} >
+                            <ProposalVotes proposalId={proposalId} />
+                        </GridItem>
+                        <GridItem colSpan={6} >
+                            <ProposalBlockTimestamp blockTimestamp={snapshot} />
+                            <ProposalBlockTimestamp blockTimestamp={deadline} deadline />
+                            <p>
+                                <InfoIcon /> {proposalState}
+                            </p>
+                            {
+                                hasVoted && <p>
+                                    <CheckIcon color='blue' /> Vote casted
+                                </p>
+                            }
+                        </GridItem>
+                    </Grid>
+
+                    {
+                        canVote &&
+                        <Container display='flex' justifyContent='space-around' marginTop='16px'>
+                            <div>
+                                <TotalVotingPower />
+                                <p><UnlockIcon /> <b>Available votes:</b> {availableVoting} votes</p>
+                            </div>
+                            <button className='primary-button' onClick={handleVote}>
+                                Vote
+                            </button>
+                        </Container>
+                    }
+                    {
+                        onlySuccessful && proposalState === 'Succeeded'
+                        && <Container display='flex' justifyContent='center' marginTop='16px'>
+                            <button className='primary-button'
+                                onClick={() => execute({
+                                    recklesslySetUnpreparedArgs: [
+                                        [DAOModeratorsAddress],
+                                        [0],
+                                        calldatas,
+                                        descriptionHash
+                                    ]
+                                })}
+                            >
+                                Execute proposal
+                            </button>
+                        </Container>
+                    }
+                </Box>
+            }
             <Modal isOpen={isOpen} onClose={onClose} >
                 <ModalOverlay
                     bg='#211f24'
@@ -139,7 +218,9 @@ export function Proposal({ proposal, availableVoting = 0 }) {
                     backdropBlur='2px'
                 />
                 <ModalContent bg='#211f24' border='white 1px solid'>
-                    <ModalHeader>Vote for the proposal {proposalId.toString()}</ModalHeader>
+                    <ModalHeader>
+                        Vote for &quot;{description.substring(0, 80)}{description.length > 80 && '...'}&quot;
+                    </ModalHeader>
                     <ModalCloseButton />
                     <Formik
                         initialValues={{
@@ -224,6 +305,5 @@ export function Proposal({ proposal, availableVoting = 0 }) {
                 </ModalContent>
             </Modal>
         </>
-
     );
 }
