@@ -237,12 +237,12 @@ export function Proposal(
                             <Form>
                                 <ModalBody pb={6}>
 
-                                    <Field name='support'>
+                                    <Field name="support">
                                         {({ field }) => (
                                             <FormControl>
                                                 <FormLabel>Your support for this proposal</FormLabel>
                                                 <Select
-                                                    id='support'
+                                                    id="support"
                                                     onChange={field.onChange}
                                                 >
                                                     {supportOptions.map((key, i) =>
@@ -260,12 +260,12 @@ export function Proposal(
                                         )}
                                     </Field>
 
-                                    <Field name='votingWeight'>
+                                    <Field name="votingWeight">
                                         {({ field }) => (
                                             <FormControl>
                                                 <FormLabel>Your voting weight for this proposal</FormLabel>
                                                 <Select
-                                                    id='votingWeight'
+                                                    id="votingWeight"
                                                     onChange={field.onChange}
                                                 >
                                                     {votingWeightOptions.map((weight) =>
@@ -286,7 +286,7 @@ export function Proposal(
                                 </ModalBody>
 
                                 <ModalFooter>
-                                    <button type='submit'>Submit</button>
+                                    <button type="submit">Submit</button>
                                 </ModalFooter>
                             </Form>
                         )}

@@ -116,7 +116,7 @@ export function ProposeForm() {
                             <Form>
                                 <ModalBody pb={6}>
 
-                                    <Field name='name'>
+                                    <Field name="name">
                                         {({ field }) => (
                                             <FormControl>
                                                 <FormLabel>Name</FormLabel>
@@ -133,7 +133,7 @@ export function ProposeForm() {
                                         )}
                                     </Field>
 
-                                    <Field name='email'>
+                                    <Field name="email">
                                         {({ field }) => (
                                             <FormControl mt={4}>
                                                 <FormLabel>Email</FormLabel>
@@ -151,7 +151,7 @@ export function ProposeForm() {
                                     </Field>
 
 
-                                    <Field name='moderatorAddress'>
+                                    <Field name="moderatorAddress">
                                         {({ field }) => (
                                             <FormControl>
                                                 <FormLabel>Wallet address</FormLabel>
@@ -171,7 +171,7 @@ export function ProposeForm() {
                                 </ModalBody>
 
                                 <ModalFooter>
-                                    <button type='submit'>Submit</button>
+                                    <button type="submit">Submit</button>
                                 </ModalFooter>
                             </Form>
                         )}
