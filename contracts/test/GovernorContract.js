@@ -354,6 +354,50 @@ describe('GovernorContract', function () {
                 ).to.be.reverted;
             }
         );
+
+        it('Should get available votes', async function () {
+            const {
+                GovernorContract, GovernanceToken, DAOModerators
+            } = await loadFixture(deployGovernorContractFixture);
+
+            // eslint-disable-next-line no-undef
+            const [{ address: owner }] = await ethers.getSigners();
+            await GovernanceToken.delegate(owner);
+
+            await moveBlocks(1);
+
+            expect(
+                await GovernorContract.getAvailableVotingPower()
+            ).to.equal(TOTAL_SUPPLY);
+
+            const calldata = getCalldata(DAOModerators, 0);
+
+            const tx = await GovernorContract.propose(
+                [DAOModerators.address], [0], [calldata],
+                proposalDescription
+            );
+            const receipt = await tx.wait();
+
+            const createProposalEvent = receipt.events?.filter(
+                (e) => e.event === 'ProposalCreated'
+            );
+
+            const proposalId = createProposalEvent[0].args.proposalId;
+
+            await moveBlocks(INITIAL_VOTING_DELAY + 1);
+
+            expect(
+                await GovernorContract.getAvailableVotingPower()
+            ).to.equal(TOTAL_SUPPLY);
+
+            await GovernorContract.vote(
+                proposalId, weight.sufficient, support.for
+            );
+
+            expect(
+                await GovernorContract.getAvailableVotingPower()
+            ).to.equal(TOTAL_SUPPLY - weight.sufficient ** 2);
+        });
     });
 
     describe('Proposal outcome', function () {

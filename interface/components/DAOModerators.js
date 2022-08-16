@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useContractRead } from 'wagmi';
 import DAOModeratorsABI from '../../contracts/artifacts/contracts/DAOModerators.sol/DAOModerators.json';
+import { DAOModeratorsAddress } from '../shared/constants';
+import { Heading, Grid, GridItem } from '@chakra-ui/react';
 
 export function DAOModerators() {
     const [isLoading, setIsLoading] = useState(true);
@@ -8,7 +10,7 @@ export function DAOModerators() {
     const [error, setError] = useState('');
 
     useContractRead({
-        addressOrName: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+        addressOrName: DAOModeratorsAddress,
         contractInterface: DAOModeratorsABI.abi,
         functionName: 'getModerators',
         onSuccess(data) {
@@ -18,20 +20,43 @@ export function DAOModerators() {
         onError(error) {
             setIsLoading(false);
             setError(error);
-        }
-        // TODO: frh -> styles and test if needed watch: true
+        },
+        watch: true
     });
 
     return (
         <>
             {error && error}
             {isLoading && <span>Loading DAO Moderators ...</span>}
-            {data.length > 0 && data.map(moderator =>
-                <>
-                    <span>Name: {moderator.name}</span>
-                    <span>Email: {moderator.email}</span>
-                    <span>Address: {moderator.moderatorAddress}</span>
-                </>
+            <Heading
+                as='h2'
+                size='lg'
+                noOfLines={1}
+                padding='16px 0'
+                textAlign='center'
+            >
+                Current DAO moderators
+            </Heading>
+            {data.length > 0 && data.map((moderator, i) =>
+                <Grid
+                    templateColumns='repeat(12, 1fr)'
+                    gap={4}
+                    key={i}
+                    border='1px solid #2d2d2d'
+                    margin='12px'
+                    padding='24px'
+                    borderRadius='12px'
+                    alignItems='center'
+                >
+                    <GridItem>
+                        <span style={{ fontSize: '48px' }}>{i + 1}</span>
+                    </GridItem>
+                    <GridItem colSpan={9} >
+                        <p><b>Name:</b> {moderator.name}</p>
+                        <p><b>Email:</b> {moderator.email}</p>
+                        <p><b>Wallet Address:</b> {moderator.moderatorAddress}</p>
+                    </GridItem>
+                </Grid>
             )}
         </>
     );

@@ -36,9 +36,7 @@ contract GovernorContract is
     using SafeCast for uint256;
     using Timers for Timers.BlockNumber;
 
-    /**
-     * @dev Emitted when a vote is casted
-     */
+    /// @dev Emitted when a vote is casted
     event LogVoteCasted(
         address voter,
         uint256 proposalId,
@@ -69,6 +67,24 @@ contract GovernorContract is
     // solhint-disable-next-line no-empty-blocks
     {
 
+    }
+
+    /// @dev Returns votes available for voting in this voting period
+    function getAvailableVotingPower() public view returns (uint256) {
+        address account = _msgSender();
+
+        if (_currentPeriodVoteStart.isUnset()) {
+            return _getVotes(account, block.number - 1, _defaultParams());
+        } else {
+            uint256 _totalWeight = _getVotes(
+                account,
+                _currentPeriodVoteStart.getDeadline(),
+                _defaultParams()
+            );
+            return
+                _totalWeight -
+                _castedVotes[_currentPeriodVoteStart.getDeadline()][account];
+        }
     }
 
     /**
@@ -287,12 +303,7 @@ contract GovernorContract is
     }
 
     /// @dev Override and disable this function
-    function castVote(uint256, uint8)
-        public
-        pure
-        override
-        returns (uint256)
-    {
+    function castVote(uint256, uint8) public pure override returns (uint256) {
         // solhint-disable-next-line reason-string
         revert();
     }
