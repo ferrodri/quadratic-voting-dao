@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { useBlockNumber, useContractRead, useProvider } from 'wagmi';
+import { useAccount, useBlockNumber, useContractRead, useProvider } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import { GovernorContractAddress } from '../shared/constants';
-import { Proposal } from './index';
+import { HasVoted, Proposal } from './index';
+
 
 export function ListProposals({ onlyActive, onlySuccessful, availableVoting }) {
+    const { isConnected } = useAccount();
     const provider = useProvider();
     const { data: blockNumber } = useBlockNumber({ watch: true });
     const [proposals, setProposals] = useState([]);
@@ -59,12 +61,21 @@ export function ListProposals({ onlyActive, onlySuccessful, availableVoting }) {
     return (
         <>
             {proposals.length > 0 && proposals.map((proposal, i) =>
-                <Proposal
-                    key={i}
-                    proposal={proposal}
-                    availableVoting={availableVoting}
-                    onlySuccessful={onlySuccessful}
-                />
+                isConnected
+                    ? <HasVoted proposalId={proposal.proposalId} key={i}>
+                        <Proposal
+                            key={i}
+                            proposal={proposal}
+                            availableVoting={availableVoting}
+                            onlySuccessful={onlySuccessful}
+                        />
+                    </HasVoted>
+                    : <Proposal
+                        key={i}
+                        proposal={proposal}
+                        availableVoting={availableVoting}
+                        onlySuccessful={onlySuccessful}
+                    />
             )}
         </>
     );

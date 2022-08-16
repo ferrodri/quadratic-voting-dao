@@ -22,19 +22,19 @@ import { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 import { BigNumber, ethers } from 'ethers';
 import * as Yup from 'yup';
-import { useAccount, useContractRead, useContractWrite } from 'wagmi';
+import { useContractRead, useContractWrite } from 'wagmi';
 import GovernorContractABI from '../../contracts/artifacts/contracts/GovernorContract.sol/GovernorContract.json';
 import {
     DAOModeratorsAddress, GovernorContractAddress, supportEnum, proposalStateEnum
 } from '../shared/constants';
 import { ProposalBlockTimestamp, ProposalVotes, TotalVotingPower } from './index';
 
-export function Proposal({ proposal, onlySuccessful, availableVoting = 0 }) {
-    const { address } = useAccount();
+export function Proposal(
+    { availableVoting = 0, hasVoted = false, proposal, onlySuccessful, }
+) {
     const [isLoading, setIsLoading] = useState(true);
     const [proposalState, setProposalState] = useState('');
     const [error, setError] = useState('');
-    const [hasVoted, setHasVoted] = useState(false);
 
     const { calldatas, deadline, description, proposalId, snapshot } = proposal;
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -64,17 +64,6 @@ export function Proposal({ proposal, onlySuccessful, availableVoting = 0 }) {
         onError(error) {
             setIsLoading(false);
             setError(error);
-        },
-        watch: true
-    });
-
-    useContractRead({
-        addressOrName: GovernorContractAddress,
-        contractInterface: GovernorContractABI.abi,
-        functionName: 'hasVoted',
-        args: [proposalId, address],
-        onSuccess(data) {
-            setHasVoted(data);
         },
         watch: true
     });
