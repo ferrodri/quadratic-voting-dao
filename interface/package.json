@@ -1,0 +1,42 @@
+{
+  "name": "quadratic-voting-dao-interface",
+  "version": "0.1.0",
+  "description": "Interface that manages the election of the moderators of the DAO through quadratic voting",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ferrodri/quadratic-voting-dao.git"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [
+    "quadratic voting",
+    "dao",
+    "QV",
+    "solidity"
+  ],
+  "author": "Fernando Rodriguez Hervias",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ferrodri/quadratic-voting-dao/issues"
+  },
+  "homepage": "https://github.com/ferrodri/quadratic-voting-dao#readme",
+  "dependencies": {
+    "@chakra-ui/icons": "2.0.8",
+    "@chakra-ui/react": "2.2.6",
+    "ethers": "5.6.9",
+    "formik": "2.2.9",
+    "next": "12.2.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "wagmi": "0.6.1",
+    "yup": "0.32.11"
+  },
+  "devDependencies": {
+    "eslint": "8.21.0",
+    "eslint-config-next": "12.2.4"
+  }
+}
