@@ -26,7 +26,11 @@ export function AvailableVotingPower({ children }) {
 
     return (
         <>
-            {error && error}
+            {
+                error && <span className='error'>
+                    Error: {error.message ? error.message : JSON.stringify(error)}
+                </span>
+            }
             {isLoading && <span>Loading available voting power...</span>}
             {React.cloneElement(children, { availableVoting: availableVoting })}
         </>

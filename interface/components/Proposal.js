@@ -137,7 +137,11 @@ export function Proposal(
 
     return (
         <>
-            {error && error}
+            {
+                error && <span className='error'>
+                    Error: {error.message ? error.message : JSON.stringify(error)}
+                </span>
+            }
             {isLoading && <span>Loading proposal state ...</span>}
             {
                 (

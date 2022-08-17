@@ -32,6 +32,9 @@ export const globalCSS = {
             },
             '.chakra-alert__title': {
                 paddingRight: '16px'
+            },
+            '.error': {
+                color: 'red'
             }
         }
     }

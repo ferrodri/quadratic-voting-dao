@@ -36,11 +36,15 @@ export function ProposalVotes({ proposalId }) {
 
     return (
         <>
-            {error && error}
+            {
+                error && <span className='error'>
+                    Error: {error.message ? error.message : JSON.stringify(error)}
+                </span>
+            }
             {isLoading && <p>Loading proposal votes ...</p>}
-            <p><CheckIcon color='green'/> <b>For: </b>{forVotes} votes</p>
-            <p><CloseIcon color='red'/> <b>Against: </b>{againstVotes} votes</p>
-            <p><MinusIcon/> <b>Abstain: </b>{abstainVotes} votes</p>
+            <p><CheckIcon color='green' /> <b>For: </b>{forVotes} votes</p>
+            <p><CloseIcon color='red' /> <b>Against: </b>{againstVotes} votes</p>
+            <p><MinusIcon /> <b>Abstain: </b>{abstainVotes} votes</p>
         </>
     );
 }

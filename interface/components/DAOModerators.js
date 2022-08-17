@@ -26,7 +26,11 @@ export function DAOModerators() {
 
     return (
         <>
-            {error && error}
+            {
+                error && <span className='error'>
+                    Error: {error.message ? error.message : JSON.stringify(error)}
+                </span>
+            }
             {isLoading && <span>Loading DAO Moderators ...</span>}
             <Heading
                 as='h2'

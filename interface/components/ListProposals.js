@@ -7,6 +7,8 @@ import { HasVoted, Proposal } from './index';
 
 
 export function ListProposals({ onlyActive, onlySuccessful, availableVoting }) {
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
     const { isConnected } = useAccount();
     const provider = useProvider();
     const { data: blockNumber } = useBlockNumber({ watch: true });
@@ -37,6 +39,7 @@ export function ListProposals({ onlyActive, onlySuccessful, availableVoting }) {
                     : 'earliest',
             toBlock: 'latest'
         }).then(logs => {
+            setIsLoading(false);
             let proposals = logs.filter(log => {
                 const deadline =
                     governorContract.interface.parseLog(log).args[7].toNumber();
@@ -55,11 +58,20 @@ export function ListProposals({ onlyActive, onlySuccessful, availableVoting }) {
                 };
             });
             setProposals(proposals);
+        }).catch(error => {
+            setIsLoading(false);
+            setError(error);
         });
     }, [blockNumber, onlyActive, provider, votingPeriod]);
 
     return (
         <>
+            {
+                error && <span className='error'>
+                    Error: {error.message ? error.message : JSON.stringify(error)}
+                </span>
+            }
+            {isLoading && <span>Loading DAO proposals ...</span>}
             {proposals.length > 0 && proposals.map((proposal, i) =>
                 isConnected
                     ? <HasVoted proposalId={proposal.proposalId} key={i}>

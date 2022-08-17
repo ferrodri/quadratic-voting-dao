@@ -28,9 +28,13 @@ export function TotalVotingPower() {
 
     return (
         <>
-            {error && error}
+            {
+                error && <span className='error'>
+                    Error: {error.message ? error.message : JSON.stringify(error)}
+                </span>
+            }
             {isLoading && <span>Loading total voting power balance ...</span>}
-            <p><LockIcon/> <b>Total voting power:</b> {totalVoting} votes</p>
+            <p><LockIcon /> <b>Total voting power:</b> {totalVoting} votes</p>
         </>
     );
 }
