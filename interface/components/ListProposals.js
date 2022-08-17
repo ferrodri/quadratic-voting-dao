@@ -21,7 +21,10 @@ export function ListProposals({ onlyActive, onlySuccessful, availableVoting }) {
         functionName: 'votingPeriod',
         onSuccess(data) {
             setVotingPeriod(data.toNumber());
-        }
+        },
+        onError(error) {
+            setError(error);
+        },
     });
 
     useEffect(() => {
