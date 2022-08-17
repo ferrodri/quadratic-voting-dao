@@ -57,16 +57,33 @@ export function ProposeForm() {
             });
         },
         onError(error) {
-            toast({
-                title: 'Error submitting the proposal',
-                description: (error.message ? error.message : JSON.stringify(error)),
-                status: 'error',
-                duration: 9000,
-                containerStyle: {
-                    maxHeight: '500px'
-                },
-                isClosable: true
-            });
+            const minimumVotingPeriodNotReached = error.reason?.includes(
+                'Voting period should be longer'
+            );
+
+            if (minimumVotingPeriodNotReached) {
+                toast({
+                    title: 'Minimum voting period not reached',
+                    description: 'Please submit a proposal after current proposals voting period ends',
+                    status: 'error',
+                    duration: 15000,
+                    containerStyle: {
+                        maxHeight: '500px'
+                    },
+                    isClosable: true
+                });
+            } else {
+                toast({
+                    title: 'Error submitting the proposal',
+                    description: (error.message ? error.message : JSON.stringify(error)),
+                    status: 'error',
+                    duration: 9000,
+                    containerStyle: {
+                        maxHeight: '500px'
+                    },
+                    isClosable: true
+                });
+            }
         }
     });
 

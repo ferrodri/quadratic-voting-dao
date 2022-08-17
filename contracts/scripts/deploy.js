@@ -8,58 +8,65 @@ const { deployGovernorContractFixture } = require('../test/shared/fixtures');
 const {
     DAO_MODERATORS: { NEW_MODERATORS, SET_NEW_MODERATOR_FN }
 } = require('../test/shared/constants');
-const proposalDescription = 'Example proposal description';
 
+const createProposal = async (
+    GovernorContract, DAOModerators, moderatorIndex
+) => {
+    const { calldata, description } = getProposalData(
+        DAOModerators, moderatorIndex
+    );
+
+    // eslint-disable-next-line no-undef
+    const [{ address: owner }] = await ethers.getSigners();
+
+    const tx = await GovernorContract.propose(
+        [DAOModerators.address], [0], [calldata], description
+    );
+    const receipt = await tx.wait();
+
+    const createProposalEvent = receipt.events?.filter(
+        (e) => e.event === 'ProposalCreated'
+    );
+
+    return {
+        calldata,
+        status: receipt.status,
+        owner,
+        proposalId: createProposalEvent[0].args.proposalId
+    };
+};
+
+const getProposalData = (DAOModerators, moderatorIndex) => {
+    const { NAME, EMAIL, MODERATOR_ADDRESS } = NEW_MODERATORS[moderatorIndex];
+    return {
+        calldata: DAOModerators.interface.encodeFunctionData(
+            SET_NEW_MODERATOR_FN, [NAME, EMAIL, MODERATOR_ADDRESS]
+        ),
+        description: `Proposing moderator ${NAME} with email ${EMAIL} and wallet address ${MODERATOR_ADDRESS}`
+    };
+};
+
+/**
+ * Deployment will set the following:
+ * 1. One moderator.
+ * 2. Two proposals.
+ * The purpose is to make the dev-testing of the ABI with the frontend suffice.
+ */
 async function main() {
     const {
         GovernorContract, GovernanceToken, DAOModerators
     } = await deployGovernorContractFixture();
+
     // eslint-disable-next-line no-undef
     const [{ address: owner }] = await ethers.getSigners();
     await GovernanceToken.delegate(owner);
 
-    // Mine a block every second
+    await createProposal(GovernorContract, DAOModerators, 0);
+    await createProposal(GovernorContract, DAOModerators, 1);
+
+    // Mine a block every five seconds for the dev-testing
     // eslint-disable-next-line no-undef
-    await network.provider.send('evm_setIntervalMining', [15000]);
-
-    // TODO: frh -> decide deploy, maybe some defeated and so on
-    // const createProposal = async (
-    //     GovernorContract, GovernanceToken, DAOModerators, moderatorIndex
-    // ) => {
-    
-    //     const calldata = getCalldata(DAOModerators, moderatorIndex);
-    //     // eslint-disable-next-line no-undef
-    //     const [{ address: owner }] = await ethers.getSigners();
-    
-    //     const tx = await GovernorContract.propose(
-    //         [DAOModerators.address], [0], [calldata],
-    //         `${proposalDescription} ${moderatorIndex}`
-    //     );
-    //     const receipt = await tx.wait();
-    
-    //     const createProposalEvent = receipt.events?.filter(
-    //         (e) => e.event === 'ProposalCreated'
-    //     );
-    
-    //     return {
-    //         calldata,
-    //         status: receipt.status,
-    //         owner,
-    //         proposalId: createProposalEvent[0].args.proposalId
-    //     };
-    // };
-    
-    // const getCalldata = (DAOModerators, moderatorIndex) => {
-    //     const { NAME, EMAIL, MODERATOR_ADDRESS } = NEW_MODERATORS[moderatorIndex];
-    //     return DAOModerators.interface.encodeFunctionData(
-    //         SET_NEW_MODERATOR_FN, [NAME, EMAIL, MODERATOR_ADDRESS]
-    //     );
-    // };
-
-    // const { proposalId } = await createProposal(
-    //     GovernorContract, GovernanceToken, DAOModerators, 0
-    // );
-    // console.log('proposalId: ', proposalId);
+    await network.provider.send('evm_setIntervalMining', [5000]);
 
     console.log('GovernorContract deployed to:', GovernorContract.address);
     console.log('GovernanceToken deployed to:', GovernanceToken.address);

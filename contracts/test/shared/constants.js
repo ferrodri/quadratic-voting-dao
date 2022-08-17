@@ -1,33 +1,18 @@
 module.exports = {
     DAO_MODERATORS: {
-        NAME: 'Fernando',
+        NAME: 'Fernando Rodriguez Hervias',
         EMAIL: 'f.rodriguez.hervias@gmail.com',
         MODERATOR_ADDRESS: '0xC776cBDDeA014889E8BaB4323C894C5c34DB214D',
         NEW_MODERATORS: [
             {
-                NAME: 'Daniel',
-                EMAIL: 'daniel@gmail.com',
-                MODERATOR_ADDRESS: '0xEf19b3c41978bECC5fbEA27515a1894aa28e3461'
-            },
-            {
-                NAME: 'Tom',
+                NAME: 'Tom Sawyer',
                 EMAIL: 'tom@gmail.com',
                 MODERATOR_ADDRESS: '0x820fb393d946194BFd5d3e07475c84a812f0C176'
             },
             {
-                NAME: 'Nicolas',
+                NAME: 'Nicolas Cage',
                 EMAIL: 'nicolas@gmail.com',
                 MODERATOR_ADDRESS: '0x82e67Fb485B9E29A3cd2E6FDfa789e4220324671'
-            },
-            {
-                NAME: 'Sara',
-                EMAIL: 'sara@gmail.com',
-                MODERATOR_ADDRESS: '0xdAC17F958D2ee523a2206206994597C13D831ec7'
-            },
-            {
-                NAME: 'Olivia',
-                EMAIL: 'olivia@gmail.com',
-                MODERATOR_ADDRESS: '0xb986351E74DAF6b7628190Ca49d3703527ca3D09'
             }
         ],
         SET_NEW_MODERATOR_FN: 'setNewModerator'

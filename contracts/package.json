@@ -1,7 +1,7 @@
 {
     "name": "quadratic-voting-dao",
     "version": "1.0.0",
-    "description": "",
+    "description": "Smart contracts that manage the election of the moderators of the DAO through quadratic voting",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
