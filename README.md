@@ -11,11 +11,12 @@ Please read through this setup for smart contracts and interface to work.
 - Contracts folder
 1. Install Node Modules (nvm use / npm install)
 2. Run Tests (npx hardhat test)
-3. Deploy Contracts / Local Blockchain Instance (npx hardhat node - *TERMINAL ONE*)
+3. Start a local node (npx hardhat node - *TERMINAL ONE*)
+4. Deploy Contracts / Local Blockchain Instance (npx hardhat --network localhost run scripts/deploy.js - *TERMINAL TWO*)
 
 - Interface folder
 1. Install Node Modules (nvm use / npm install)
-2. Start Project (npm run start - *TERMINAL TWO*)
+2. Start Project (npm run start - *TERMINAL THREE*)
 
 - Connect wallet using Metamask (Must connect to hardhat instance by switching network and importing a hardhat account)
 https://support.chainstack.com/hc/en-us/articles/4408642503449-Using-MetaMask-with-a-Hardhat-node
