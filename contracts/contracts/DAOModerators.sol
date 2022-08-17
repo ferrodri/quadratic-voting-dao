@@ -3,7 +3,7 @@ pragma solidity =0.8.9;
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 /**
- * @title Template for appointing the moderators of a DAO
+ * @title Template for appointing the moderators of the DAO
  */
 contract DAOModerators is Ownable {
     struct Moderator {
