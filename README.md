@@ -17,7 +17,7 @@ Please read through this setup for smart contracts and interface to work.
 - Interface folder
 1. Install Node Modules (nvm use / npm install)
 2. Build the project (npm run build)
-3. Start Project (npm run start - *TERMINAL THREE*)
+3. Start Project (npm start - *TERMINAL THREE*)
 
 - Connect wallet using Metamask (Must connect to hardhat instance by switching network and importing a hardhat account)
 https://support.chainstack.com/hc/en-us/articles/4408642503449-Using-MetaMask-with-a-Hardhat-node
