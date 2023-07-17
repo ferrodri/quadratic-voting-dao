@@ -4,6 +4,8 @@
 
 Welcome to the Quadratic Voting DAO. The purpose of this project is to demonstrate a quadratic voting model. The project manages the election of the moderators of the DAO through quadratic voting.
 
+For the definition of the quadratic voting model, please refer to: https://en.wikipedia.org/wiki/Quadratic_voting
+
 # Setup
 Please read through this setup for smart contracts and interface to work.
 
